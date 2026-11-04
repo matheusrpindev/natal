@@ -5,11 +5,12 @@ import { nomeCasa } from "@/components/CartaoCasa";
 import { estaLogado } from "@/lib/admin";
 import { formatarDataHora } from "@/lib/config";
 import { db, faseAtual, usandoSupabase, type Inscricao, type StatusInscricao } from "@/lib/db";
-import { FASES, NOME_FASE, fasePelasDatas } from "@/lib/phase";
+import { NOME_FASE } from "@/lib/phase";
 import { ranking } from "@/lib/ranking";
-import { definirFase, sair } from "./actions";
+import { sair } from "./actions";
 import { BotoesStatus } from "./BotoesStatus";
 import { Login } from "./Login";
+import { SeletorFase } from "./SeletorFase";
 
 export const metadata: Metadata = { title: "Organização", robots: { index: false } };
 
@@ -60,7 +61,7 @@ function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) =>
 async function Painel() {
   if (!(await estaLogado())) return <Login />;
   const store = await db();
-  const [inscricoes, { fase, manual }, { lista, total }] = await Promise.all([
+  const [inscricoes, { fase }, { lista, total }] = await Promise.all([
     store.listarInscricoes(),
     faseAtual(),
     ranking(),
@@ -99,23 +100,12 @@ async function Painel() {
       </div>
 
       <section className="cartao p-6">
-        <h2 className="text-xl font-extrabold">🗓️ Controle de fase</h2>
+        <h2 className="text-xl font-extrabold">🗓️ Fase do concurso</h2>
         <p className="mt-1 text-sm text-tinta-suave">
-          Por padrão o site muda de fase sozinho pelas datas (hoje seria: <strong>{NOME_FASE[fasePelasDatas(new Date())]}</strong>).
-          Use o controle manual só para testes ou imprevistos, como prorrogar as inscrições ou liberar o resultado mais cedo.
+          Você decide quando cada fase começa. O site mostra para o público só o que vale na fase atual. Clique numa fase
+          para mudar.
         </p>
-        <form action={definirFase} className="mt-4 flex flex-wrap items-center gap-3">
-          <select name="fase" defaultValue={manual ? fase : "auto"} className="campo w-auto">
-            <option value="auto">Automático (pelas datas)</option>
-            {FASES.map((f) => (
-              <option key={f} value={f}>
-                Forçar: {NOME_FASE[f]}
-              </option>
-            ))}
-          </select>
-          <button className="btn btn-verde px-5 py-2.5">Salvar</button>
-          {manual && <span className="text-sm font-bold text-vermelho">Fase manual ativa</span>}
-        </form>
+        <SeletorFase atual={fase} />
       </section>
 
       <section className="cartao p-6">

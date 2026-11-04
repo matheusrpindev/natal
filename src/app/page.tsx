@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Contagem } from "@/components/Contagem";
 import { Neve } from "@/components/Neve";
+import { Organizador } from "@/components/Organizador";
 import { DATAS, EVENTO, formatarData } from "@/lib/config";
 import { faseAtual } from "@/lib/db";
 import { proximoMarco, type Fase } from "@/lib/phase";
@@ -30,7 +31,6 @@ const ETAPAS = [
 const CHAMADA: Record<Fase, { texto: string; href: string; rotulo: string } | null> = {
   "em-breve": { texto: "As inscrições começam em breve. Já vá preparando as luzes!", href: "/regulamento", rotulo: "Ler o regulamento" },
   inscricoes: { texto: "Inscrições abertas! Mostre a decoração da sua casa.", href: "/inscricao", rotulo: "Inscrever minha casa" },
-  "aguardando-votacao": { texto: "Inscrições encerradas. Conheça as casas participantes!", href: "/casas", rotulo: "Ver as casas" },
   votacao: { texto: "A votação está aberta! Escolha a casa mais bonita.", href: "/votar", rotulo: "Votar agora" },
   apuracao: { texto: "Votação encerrada! Estamos apurando os votos.", href: "/casas", rotulo: "Ver as casas" },
   resultado: { texto: "Saiu o resultado do Natal Iluminado!", href: "/resultado", rotulo: "Ver o resultado" },
@@ -107,6 +107,8 @@ export default function Inicio() {
           ))}
         </ol>
       </section>
+
+      <Organizador />
 
       <section className="bg-verde text-white">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-[1fr_auto]">

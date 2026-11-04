@@ -36,10 +36,10 @@ export async function mudarStatus(id: string, status: "aprovada" | "recusada" | 
   revalidatePath("/", "layout");
 }
 
-export async function definirFase(dados: FormData) {
+export async function definirFase(fase: string) {
   await exigirAdmin();
-  const valor = dados.get("fase");
+  if (!isFase(fase)) throw new Error("Fase inválida.");
   const store = await db();
-  await store.salvarFaseManual(isFase(valor) ? valor : null);
+  await store.salvarFase(fase);
   revalidatePath("/", "layout");
 }

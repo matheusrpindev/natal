@@ -12,7 +12,7 @@ export function Logo({ claro = true }: { claro?: boolean }) {
         ⭐
       </span>
       <span className="flex flex-col">
-        <span className={`font-festiva text-2xl font-bold sm:text-3xl ${claro ? "brilho-dourado" : "text-vermelho"}`}>
+        <span className={`font-festiva text-2xl font-bold whitespace-nowrap sm:text-3xl ${claro ? "brilho-dourado" : "text-vermelho"}`}>
           Natal Iluminado
         </span>
         <span className={`text-[0.7rem] font-extrabold tracking-[0.25em] uppercase ${claro ? "text-white/85" : "text-verde"}`}>

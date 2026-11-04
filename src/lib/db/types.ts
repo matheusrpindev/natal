@@ -47,7 +47,7 @@ export interface Store {
   registrarVoto(voto: NovoVoto): Promise<ResultadoVoto>;
   contarVotos(): Promise<Record<string, number>>;
   totalVotos(): Promise<number>;
-  lerFaseManual(): Promise<Fase | null>;
-  salvarFaseManual(fase: Fase | null): Promise<void>;
+  lerFase(): Promise<Fase | null>;
+  salvarFase(fase: Fase): Promise<void>;
   urlFoto(caminho: string): string;
 }

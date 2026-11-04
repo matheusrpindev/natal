@@ -18,7 +18,10 @@ export function Contagem({ alvo, rotulo }: { alvo: string; rotulo: string }) {
       clearInterval(t);
     };
   }, []);
-  const p = partes(agora == null ? 0 : new Date(alvo).getTime() - agora);
+  const restante = agora == null ? null : new Date(alvo).getTime() - agora;
+  // Se a organização prorrogou a fase, a data prevista já passou: esconde a contagem.
+  if (restante != null && restante <= 0) return null;
+  const p = partes(restante ?? 0);
   const itens: [number, string][] = [
     [p.dias, "dias"],
     [p.horas, "horas"],

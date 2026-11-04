@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Votar" };
 
 async function Conteudo({ searchParams }: { searchParams: Promise<{ casa?: string | string[] }> }) {
   const { fase } = await faseAtual();
-  if (fase === "em-breve" || fase === "inscricoes" || fase === "aguardando-votacao") {
+  if (fase === "em-breve" || fase === "inscricoes") {
     return (
       <Aviso emoji="⏳" titulo="A votação ainda não começou">
         A votação vai de <strong>{formatarData(DATAS.votacaoInicio)}</strong> a{" "}

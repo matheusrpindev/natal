@@ -1,41 +1,47 @@
 import { DATAS } from "./config";
 
-export const FASES = ["em-breve", "inscricoes", "aguardando-votacao", "votacao", "apuracao", "resultado"] as const;
+/** Fases do concurso. Quem define a fase atual é a organização, pelo painel /admin. */
+export const FASES = ["em-breve", "inscricoes", "votacao", "apuracao", "resultado"] as const;
 export type Fase = (typeof FASES)[number];
+
+export const FASE_INICIAL: Fase = "em-breve";
 
 export const NOME_FASE: Record<Fase, string> = {
   "em-breve": "Em breve",
   inscricoes: "Inscrições abertas",
-  "aguardando-votacao": "Aguardando votação",
   votacao: "Votação aberta",
-  apuracao: "Apuração",
-  resultado: "Resultado",
+  apuracao: "Votação encerrada",
+  resultado: "Resultado divulgado",
 };
 
-/** Fase calculada só pelas datas do config. */
-export function fasePelasDatas(agora: Date): Fase {
-  const t = agora.getTime();
-  if (t < DATAS.inscricoesInicio.getTime()) return "em-breve";
-  if (t <= DATAS.inscricoesFim.getTime()) return "inscricoes";
-  if (t < DATAS.votacaoInicio.getTime()) return "aguardando-votacao";
-  if (t <= DATAS.votacaoFim.getTime()) return "votacao";
-  if (t < DATAS.resultado.getTime()) return "apuracao";
-  return "resultado";
-}
+export const DESCRICAO_FASE: Record<Fase, string> = {
+  "em-breve": "Site só com a apresentação e o regulamento. Ninguém se inscreve nem vota.",
+  inscricoes: "Libera o formulário de inscrição. Menu: Inscrever.",
+  votacao: "Fecha as inscrições e libera a votação. Menu: Votar.",
+  apuracao: "Fecha a votação. O resultado continua em segredo. Menu: Casas participantes.",
+  resultado: "Mostra o pódio e o ranking para todo mundo. Menu: Resultado.",
+};
+
+/** Itens do menu (além de Início e Regulamento) em cada fase. */
+export const MENU_FASE: Record<Fase, { href: string; rotulo: string }[]> = {
+  "em-breve": [],
+  inscricoes: [{ href: "/inscricao", rotulo: "Inscrever minha casa" }],
+  votacao: [{ href: "/votar", rotulo: "Votar" }],
+  apuracao: [{ href: "/casas", rotulo: "Casas participantes" }],
+  resultado: [{ href: "/resultado", rotulo: "Resultado" }],
+};
 
 export function isFase(v: unknown): v is Fase {
   return typeof v === "string" && (FASES as readonly string[]).includes(v);
 }
 
-/** Próximo marco no calendário (para contagem regressiva). */
+/** Data prevista do próximo marco (para a contagem regressiva da página inicial). */
 export function proximoMarco(fase: Fase): { data: Date; rotulo: string } | null {
   switch (fase) {
     case "em-breve":
       return { data: DATAS.inscricoesInicio, rotulo: "As inscrições abrem em" };
     case "inscricoes":
       return { data: DATAS.inscricoesFim, rotulo: "As inscrições encerram em" };
-    case "aguardando-votacao":
-      return { data: DATAS.votacaoInicio, rotulo: "A votação começa em" };
     case "votacao":
       return { data: DATAS.votacaoFim, rotulo: "A votação encerra em" };
     case "apuracao":

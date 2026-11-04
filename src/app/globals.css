@@ -48,6 +48,12 @@
   --font-festiva: "P22 Yule Heavy Snow", var(--font-reserva), cursive;
 }
 
+/* Títulos com a fonte festiva sempre em maiúsculas */
+.font-festiva {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
 body {
   background: var(--creme);
   color: var(--tinta);

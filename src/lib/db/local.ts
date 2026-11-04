@@ -17,7 +17,7 @@ const ARQ = path.join(DIR, "db.json");
 interface Dados {
   inscricoes: Inscricao[];
   votos: (NovoVoto & { criadoEm: string })[];
-  faseManual: Fase | null;
+  fase?: Fase | null;
 }
 
 let fila: Promise<unknown> = Promise.resolve();
@@ -26,7 +26,7 @@ async function ler(): Promise<Dados> {
   try {
     return JSON.parse(await readFile(ARQ, "utf8")) as Dados;
   } catch {
-    return { inscricoes: [], votos: [], faseManual: null };
+    return { inscricoes: [], votos: [], fase: null };
   }
 }
 
@@ -107,12 +107,12 @@ export const localStore: Store = {
   async totalVotos() {
     return (await ler()).votos.length;
   },
-  async lerFaseManual() {
-    return (await ler()).faseManual ?? null;
+  async lerFase() {
+    return (await ler()).fase ?? null;
   },
-  async salvarFaseManual(fase: Fase | null) {
+  async salvarFase(fase: Fase) {
     await mutar((d) => {
-      d.faseManual = fase;
+      d.fase = fase;
     });
   },
   urlFoto(caminho: string) {

@@ -1,6 +1,6 @@
 import "server-only";
 import { connection } from "next/server";
-import { fasePelasDatas, type Fase } from "../phase";
+import { FASE_INICIAL, isFase, type Fase } from "../phase";
 import { localStore } from "./local";
 import { supabaseStore } from "./supabase";
 import type { Store } from "./types";
@@ -24,12 +24,11 @@ export async function db(): Promise<Store> {
   return base;
 }
 
-/** Fase atual: manual (definida no painel) ou pelas datas do config. */
-export async function faseAtual(): Promise<{ fase: Fase; manual: boolean }> {
+/** Fase atual, definida pela organização no painel. */
+export async function faseAtual(): Promise<{ fase: Fase }> {
   const store = await db();
-  const manual = await store.lerFaseManual();
-  if (manual) return { fase: manual, manual: true };
-  return { fase: fasePelasDatas(new Date()), manual: false };
+  const fase = await store.lerFase();
+  return { fase: isFase(fase) ? fase : FASE_INICIAL };
 }
 
 export type { Inscricao, StatusInscricao } from "./types";

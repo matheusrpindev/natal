@@ -126,15 +126,13 @@ export const supabaseStore: Store = {
     falhou("total de votos", error);
     return count ?? 0;
   },
-  async lerFaseManual() {
-    const { data, error } = await sb().from("configuracoes").select("valor").eq("chave", "fase_manual").maybeSingle();
+  async lerFase() {
+    const { data, error } = await sb().from("configuracoes").select("valor").eq("chave", "fase").maybeSingle();
     falhou("ler fase", error);
     return isFase(data?.valor) ? data.valor : null;
   },
-  async salvarFaseManual(fase: Fase | null) {
-    const { error } = fase
-      ? await sb().from("configuracoes").upsert({ chave: "fase_manual", valor: fase })
-      : await sb().from("configuracoes").delete().eq("chave", "fase_manual");
+  async salvarFase(fase: Fase) {
+    const { error } = await sb().from("configuracoes").upsert({ chave: "fase", valor: fase });
     falhou("salvar fase", error);
   },
   urlFoto(caminho: string) {

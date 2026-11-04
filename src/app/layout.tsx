@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Mountains_of_Christmas, Nunito } from "next/font/google";
+import { Suspense } from "react";
 import { Cabecalho } from "@/components/Cabecalho";
+import { CabecalhoDaFase } from "@/components/CabecalhoDaFase";
 import { Rodape } from "@/components/Rodape";
 import { EVENTO } from "@/lib/config";
 import "./globals.css";
@@ -19,7 +21,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={`${nunito.variable} ${festiva.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
-        <Cabecalho />
+        <Suspense fallback={<Cabecalho itensFase={[]} />}>
+          <CabecalhoDaFase />
+        </Suspense>
         <main className="flex-1">{children}</main>
         <Rodape />
       </body>

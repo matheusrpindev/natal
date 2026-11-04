@@ -12,7 +12,7 @@ Site do concurso de decoração de Natal do Scaffid II, uma iniciativa de **Marc
 | `/regulamento` | Regulamento (rascunho, revisar) |
 | `/admin` | Painel da organização: aprovar inscrições, apuração ao vivo, exportar CSV, controle de fase |
 
-O site muda de fase sozinho pelas datas em `src/lib/config.ts`. No painel dá para forçar uma fase (para testes ou para prorrogar um prazo).
+**Quem define a fase é a organização**, no painel `/admin`: Em breve → Inscrições → Votação → Votação encerrada → Resultado. O menu do site mostra só o que vale na fase atual (ex.: nas inscrições aparece só "Inscrever minha casa"). As datas em `src/lib/config.ts` servem apenas para os textos e a contagem regressiva.
 
 ## Rodar no computador
 
@@ -45,6 +45,7 @@ Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (mod
 
 - **Datas, nome e organizador**: `src/lib/config.ts`
 - **Fonte dos títulos (P22 Yule Heavy Snow)**: coloque o arquivo em `public/fonts/p22-yule-heavy-snow.woff2` (veja `public/fonts/LEIA-ME.txt`). Sem o arquivo, os títulos usam a Mountains of Christmas.
+- **Foto do Marcos**: salve em `public/marcos.jpg` (aparece na seção "Uma iniciativa de" da página inicial).
 - **Logo**: salve em `public/logo.png` e siga o comentário em `src/components/Logo.tsx`
 - **Prêmios**: seção "Prêmios" em `src/app/page.tsx`
 - **Regulamento**: `src/app/regulamento/page.tsx`
