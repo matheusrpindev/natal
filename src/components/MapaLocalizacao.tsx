@@ -4,7 +4,8 @@ import type { Map as MapaLeaflet, Marker, Polyline } from "leaflet";
 import { CircleCheck, LocateFixed, MapPinned, TriangleAlert } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { dentroDaArea } from "@/lib/area";
-import { destacarRua, montarMapa, type L as Leaflet } from "@/lib/mapaBase";
+import { destacarRua, useMapa, type L as Leaflet } from "@/lib/mapaBase";
+import { AvisoMapa } from "./AvisoMapa";
 import type { Rua } from "@/lib/ruas";
 
 export interface Ponto {
@@ -43,55 +44,46 @@ export function MapaLocalizacao({
     aoMudarRef.current = aoMudar;
   }, [aoMudar]);
 
-  useEffect(() => {
-    let cancelado = false;
-    (async () => {
-      if (!caixa.current) return;
-      const montado = await montarMapa(caixa.current, () => cancelado);
-      if (!montado) return;
-      const { L, mapa: m } = montado;
-      mapa.current = m;
-      lib.current = L;
-      const icone = L.divIcon({ html: PINO, className: "", iconSize: [34, 44], iconAnchor: [17, 43] });
+  const avisoMapa = useMapa(caixa, ({ L, mapa: m }) => {
+    mapa.current = m;
+    lib.current = L;
+    const icone = L.divIcon({ html: PINO, className: "", iconSize: [34, 44], iconAnchor: [17, 43] });
 
-      const marcar = (lat: number, lng: number, centralizar = false) => {
-        if (!dentroDaArea(lat, lng)) {
-          setAviso("Esse ponto está fora da área do concurso. Marque uma casa dentro do contorno vermelho.");
-          return false;
-        }
-        setAviso(null);
-        if (marcador.current) marcador.current.setLatLng([lat, lng]);
-        else {
-          marcador.current = L.marker([lat, lng], { icon: icone, draggable: true }).addTo(m);
-          marcador.current.on("dragend", () => {
-            const p = marcador.current!.getLatLng();
-            // Arrastou para fora: o pino volta para o último lugar válido.
-            if (!marcar(p.lat, p.lng) && ultimoValido.current) {
-              marcador.current!.setLatLng([ultimoValido.current.lat, ultimoValido.current.lng]);
-            }
-          });
-        }
-        // Longe demais para acertar o telhado? Aproxima no ponto marcado.
-        if (centralizar || m.getZoom() < 17) m.setView([lat, lng], 18);
-        ultimoValido.current = { lat, lng };
-        aoMudarRef.current({ lat, lng });
-        return true;
-      };
+    const marcar = (lat: number, lng: number, centralizar = false) => {
+      if (!dentroDaArea(lat, lng)) {
+        setAviso("Esse ponto está fora da área do concurso. Marque uma casa dentro do contorno vermelho.");
+        return false;
+      }
+      setAviso(null);
+      if (marcador.current) marcador.current.setLatLng([lat, lng]);
+      else {
+        marcador.current = L.marker([lat, lng], { icon: icone, draggable: true }).addTo(m);
+        marcador.current.on("dragend", () => {
+          const p = marcador.current!.getLatLng();
+          // Arrastou para fora: o pino volta para o último lugar válido.
+          if (!marcar(p.lat, p.lng) && ultimoValido.current) {
+            marcador.current!.setLatLng([ultimoValido.current.lat, ultimoValido.current.lng]);
+          }
+        });
+      }
+      // Longe demais para acertar o telhado? Aproxima no ponto marcado.
+      if (centralizar || m.getZoom() < 17) m.setView([lat, lng], 18);
+      ultimoValido.current = { lat, lng };
+      aoMudarRef.current({ lat, lng });
+      return true;
+    };
 
-      marcarRef.current = marcar;
-      m.on("click", (e) => marcar(e.latlng.lat, e.latlng.lng));
-      if (ultimoValido.current) marcar(ultimoValido.current.lat, ultimoValido.current.lng);
-      setPronto(true);
-    })();
+    marcarRef.current = marcar;
+    m.on("click", (e) => marcar(e.latlng.lat, e.latlng.lng));
+    if (ultimoValido.current) marcar(ultimoValido.current.lat, ultimoValido.current.lng);
+    setPronto(true);
     return () => {
-      cancelado = true;
-      mapa.current?.remove();
       mapa.current = null;
       marcador.current = null;
       destaque.current = null;
       marcarRef.current = null;
     };
-  }, []);
+  });
 
   // Quando o CEP aponta uma rua participante, aproxima e destaca a rua.
   useEffect(() => {
@@ -128,6 +120,7 @@ export function MapaLocalizacao({
     <div className="flex flex-col gap-2">
       <div className="relative overflow-hidden rounded-xl border border-borda">
         <div ref={caixa} className="h-80 w-full bg-verde-escuro sm:h-96" aria-label="Mapa da área do concurso" />
+        <AvisoMapa texto={avisoMapa} />
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="flex items-center gap-1.5 text-sm font-bold" aria-live="polite">

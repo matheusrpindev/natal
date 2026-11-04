@@ -2,7 +2,8 @@
 
 import type { Map as MapaLeaflet, Polyline } from "leaflet";
 import { useEffect, useRef, useState } from "react";
-import { desenharRuas, destacarRua, montarMapa, type L as Leaflet } from "@/lib/mapaBase";
+import { desenharRuas, destacarRua, useMapa, type L as Leaflet } from "@/lib/mapaBase";
+import { AvisoMapa } from "./AvisoMapa";
 import type { Rua } from "@/lib/ruas";
 
 /** Mapa só para consulta: a área do concurso, as ruas participantes e (opcional) uma rua em destaque. */
@@ -13,25 +14,16 @@ export function MapaArea({ destaque, mostrarRuas = true, altura = "h-80 sm:h-[28
   const linha = useRef<Polyline | null>(null);
   const [pronto, setPronto] = useState(false);
 
-  useEffect(() => {
-    let cancelado = false;
-    (async () => {
-      if (!caixa.current) return;
-      const montado = await montarMapa(caixa.current, () => cancelado);
-      if (!montado) return;
-      const { L, mapa: m } = montado;
-      if (mostrarRuas) desenharRuas(L, m);
-      mapa.current = m;
-      lib.current = L;
-      setPronto(true);
-    })();
+  const aviso = useMapa(caixa, ({ L, mapa: m }) => {
+    if (mostrarRuas) desenharRuas(L, m);
+    mapa.current = m;
+    lib.current = L;
+    setPronto(true);
     return () => {
-      cancelado = true;
-      mapa.current?.remove();
       mapa.current = null;
       linha.current = null;
     };
-  }, [mostrarRuas]);
+  });
 
   useEffect(() => {
     const m = mapa.current;
@@ -46,8 +38,9 @@ export function MapaArea({ destaque, mostrarRuas = true, altura = "h-80 sm:h-[28
   }, [destaque, pronto]);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-borda">
+    <div className="relative overflow-hidden rounded-xl border border-borda">
       <div ref={caixa} className={`${altura} w-full bg-verde-escuro`} aria-label="Mapa da área do concurso" />
+      <AvisoMapa texto={aviso} />
     </div>
   );
 }

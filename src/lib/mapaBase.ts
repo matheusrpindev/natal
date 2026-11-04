@@ -2,6 +2,7 @@
 
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
+import { useEffect, useState, type RefObject } from "react";
 import { AREA } from "./area";
 import { RUAS, type Rua } from "./ruas";
 
@@ -24,7 +25,7 @@ export interface MapaMontado {
 export async function montarMapa(
   el: HTMLElement,
   cancelado: () => boolean,
-  opcoes: { travarArea?: boolean } = {},
+  opcoes: { travarArea?: boolean; aoAvisar?: (msg: string) => void } = {},
 ): Promise<MapaMontado | null> {
   const L = (await import("leaflet")).default;
   if (cancelado() || (el as HTMLElement & { _leaflet_id?: number })._leaflet_id) return null;
@@ -39,6 +40,25 @@ export async function montarMapa(
     attribution: "© OpenStreetMap",
   });
   satelite.addTo(mapa);
+
+  // Se as imagens de satélite não carregarem (bloqueador, rede), troca para o mapa de ruas.
+  let carregouSatelite = false;
+  let falhasSatelite = 0;
+  satelite.on("tileload", () => (carregouSatelite = true));
+  satelite.on("tileerror", () => {
+    if (carregouSatelite || ++falhasSatelite < 4 || !mapa.hasLayer(satelite)) return;
+    mapa.removeLayer(satelite);
+    ruas.addTo(mapa);
+  });
+  let carregouRuas = false;
+  let falhasRuas = 0;
+  ruas.on("tileload", () => (carregouRuas = true));
+  ruas.on("tileerror", () => {
+    if (carregouRuas || ++falhasRuas !== 4) return;
+    opcoes.aoAvisar?.(
+      "As imagens do mapa não carregaram. Se você usa bloqueador de anúncios ou rede corporativa, libere este site e recarregue.",
+    );
+  });
   L.control.layers({ Satélite: satelite, Ruas: ruas }, undefined, { position: "topright" }).addTo(mapa);
 
   const mundo: [number, number][] = [
@@ -76,4 +96,42 @@ export function desenharRuas(L: L, mapa: Leaflet.Map) {
       .bindTooltip(r.nome + (r.situacao === "parcial" ? " (trecho)" : ""), { sticky: true })
       .addTo(mapa),
   );
+}
+
+/**
+ * Monta o mapa num elemento e chama `configurar` quando ele estiver pronto.
+ * Devolve uma mensagem de erro/aviso para mostrar por cima do mapa, se algo der errado.
+ */
+export function useMapa(caixa: RefObject<HTMLDivElement | null>, configurar: (m: MapaMontado) => void | (() => void)) {
+  const [aviso, setAviso] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelado = false;
+    let montado: MapaMontado | null = null;
+    let limpar: void | (() => void);
+    (async () => {
+      if (!caixa.current) return;
+      try {
+        montado = await montarMapa(caixa.current, () => cancelado, { aoAvisar: (m) => !cancelado && setAviso(m) });
+        if (!montado) return;
+        if (cancelado) {
+          montado.mapa.remove();
+          montado = null;
+          return;
+        }
+        limpar = configurar(montado);
+      } catch (e) {
+        console.error("[mapa]", e);
+        if (!cancelado) setAviso(`Não foi possível abrir o mapa (${(e as Error).message}). Recarregue a página.`);
+      }
+    })();
+    return () => {
+      cancelado = true;
+      if (typeof limpar === "function") limpar();
+      montado?.mapa.remove();
+      montado = null;
+    };
+    // O mapa é montado uma vez; `configurar` usa refs para o que muda depois.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return aviso;
 }
