@@ -9,7 +9,7 @@ import { FormInscricao } from "./FormInscricao";
 
 export const metadata: Metadata = { title: "Inscrição" };
 
-async function Conteudo() {
+async function Conteudo({ searchParams }: { searchParams: Promise<{ cep?: string | string[]; numero?: string | string[] }> }) {
   const { fase } = await faseAtual();
   if (fase === "em-breve") {
     return (
@@ -30,10 +30,12 @@ async function Conteudo() {
       </Aviso>
     );
   }
-  return <FormInscricao />;
+  const sp = await searchParams;
+  const um = (v?: string | string[]) => (typeof v === "string" ? v : "");
+  return <FormInscricao cepInicial={um(sp.cep)} numeroInicial={um(sp.numero)} />;
 }
 
-export default function PaginaInscricao() {
+export default function PaginaInscricao({ searchParams }: PageProps<"/inscricao">) {
   return (
     <>
       <Titulo
@@ -42,7 +44,7 @@ export default function PaginaInscricao() {
       />
       <div className="mx-auto max-w-3xl px-4 py-10">
         <Suspense fallback={<p className="text-center text-tinta-suave">Carregando…</p>}>
-          <Conteudo />
+          <Conteudo searchParams={searchParams} />
         </Suspense>
       </div>
     </>

@@ -39,7 +39,8 @@ async function Conteudo({ searchParams }: { searchParams: Promise<{ casa?: strin
   const casas = await casasAprovadas();
   if (casas.length === 0) return <Aviso icone={TreePine} titulo="Nenhuma casa na votação ainda" />;
   const { casa } = await searchParams;
-  return <Votacao casas={casas} inicial={typeof casa === "string" ? casa : null} />;
+  const inicial = typeof casa === "string" ? casa : null;
+  return <Votacao key={inicial ?? ""} casas={casas} inicial={inicial} />;
 }
 
 export default function PaginaVotar({ searchParams }: PageProps<"/votar">) {

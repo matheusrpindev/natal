@@ -10,6 +10,7 @@ create table if not exists inscricoes (
   responsavel text not null,
   whatsapp text not null,
   email text,
+  cep text,
   rua text not null,
   numero_casa text not null,
   complemento text,
@@ -20,6 +21,7 @@ create table if not exists inscricoes (
   fotos text[] not null default '{}'
 );
 -- Para bancos criados antes do mapa:
+alter table inscricoes add column if not exists cep text;
 alter table inscricoes add column if not exists latitude double precision;
 alter table inscricoes add column if not exists longitude double precision;
 

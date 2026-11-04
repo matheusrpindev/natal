@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CartaoCasa, nomeCasa, type CasaPublica } from "@/components/CartaoCasa";
 import { Selo } from "@/components/Icones";
+import { MapaCasas } from "@/components/MapaCasas";
 import { cpfValido, mascararCpf } from "@/lib/cpf";
 
 export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: string | null }) {
@@ -43,6 +44,15 @@ export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: str
 
   return (
     <>
+      {casas.some((c) => c.latitude != null) && (
+        <section className="mb-10">
+          <h2 className="text-xl font-extrabold">Mapa das casas</h2>
+          <p className="mb-3 text-sm text-tinta-suave">
+            Monte seu roteiro: toque num número para ver a casa, votar ou abrir o caminho no celular.
+          </p>
+          <MapaCasas casas={casas} votacao />
+        </section>
+      )}
       <div className="mx-auto mb-8 flex max-w-xl flex-col gap-2 text-center">
         <p className="text-tinta-suave">Escolha sua casa favorita e toque em “Votar”. Você vai informar seu nome e CPF.</p>
         <input

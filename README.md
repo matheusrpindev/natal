@@ -6,8 +6,8 @@ Site do concurso de decoração de Natal do Scaffid II, uma iniciativa de **Marc
 |---|---|
 | `/` | Apresentação, contagem regressiva e chamada da fase atual |
 | `/inscricao` | Formulário de inscrição com até 3 fotos (abre de 09/11 a 30/11) |
-| `/casas` | Galeria das casas aprovadas |
-| `/votar` | Votação, 1 voto por CPF (abre de 01/12 a 14/12) |
+| `/casas` | Galeria e mapa das casas aprovadas |
+| `/votar` | Votação, 1 voto por CPF, com mapa/roteiro das casas |
 | `/resultado` | Pódio e ranking (aparece a partir de 18/12) |
 | `/regulamento` | Regulamento (rascunho, revisar) |
 | `/admin` | Painel da organização: aprovar inscrições, apuração ao vivo, exportar CSV, controle de fase |
@@ -46,6 +46,7 @@ Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (mod
 - **Datas, nome e organizador**: `src/lib/config.ts`
 - **Fonte dos títulos (P22 Yule Heavy Snow)**: coloque o arquivo em `public/fonts/p22-yule-heavy-snow.woff2` (veja `public/fonts/LEIA-ME.txt`). Sem o arquivo, os títulos usam a Mountains of Christmas.
 - **Área do concurso (mapa da inscrição)**: contorno em `src/lib/area.ts`, reproduzido do desenho no Google Earth. Para deixar exato, exporte o desenho como KML e troque os pontos. A inscrição só é aceita com a casa marcada dentro da área (conferido também no servidor).
+- **Ruas participantes**: `src/lib/ruas.ts` (nome oficial e CEP dos Correios, traçado do OpenStreetMap; "inteira" ou "parcial"). Aparecem no regulamento, no "Minha casa pode participar?" da página inicial e no preenchimento do CEP da inscrição.
 - **Foto do Marcos**: salve em `public/marcos.jpg` (aparece na seção "Uma iniciativa de" da página inicial).
 - **Logo**: salve em `public/logo.png` e siga o comentário em `src/components/Logo.tsx`
 - **Prêmios**: seção "Prêmios" em `src/app/page.tsx`

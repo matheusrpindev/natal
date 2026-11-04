@@ -1,10 +1,11 @@
 "use client";
 
-import "leaflet/dist/leaflet.css";
-import type { Map as MapaLeaflet, Marker } from "leaflet";
+import type { Map as MapaLeaflet, Marker, Polyline } from "leaflet";
 import { CircleCheck, LocateFixed, MapPinned, TriangleAlert } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { AREA, dentroDaArea } from "@/lib/area";
+import { dentroDaArea } from "@/lib/area";
+import { destacarRua, montarMapa, type L as Leaflet } from "@/lib/mapaBase";
+import type { Rua } from "@/lib/ruas";
 
 export interface Ponto {
   lat: number;
@@ -16,13 +17,25 @@ const PINO = `<svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.
   <circle cx="17" cy="17" r="6" fill="#fff"/></svg>`;
 
 /** Mapa para a pessoa marcar onde fica a casa, só dentro da área do concurso. */
-export function MapaLocalizacao({ valor, aoMudar }: { valor: Ponto | null; aoMudar: (p: Ponto | null) => void }) {
+export function MapaLocalizacao({
+  valor,
+  aoMudar,
+  foco,
+}: {
+  valor: Ponto | null;
+  aoMudar: (p: Ponto | null) => void;
+  /** Rua do CEP digitado: o mapa aproxima e destaca. */
+  foco?: Rua | null;
+}) {
   const caixa = useRef<HTMLDivElement>(null);
   const mapa = useRef<MapaLeaflet | null>(null);
+  const lib = useRef<Leaflet | null>(null);
   const marcador = useRef<Marker | null>(null);
+  const destaque = useRef<Polyline | null>(null);
   const aoMudarRef = useRef(aoMudar);
   const marcarRef = useRef<((lat: number, lng: number, centralizar?: boolean) => boolean) | null>(null);
   const ultimoValido = useRef<Ponto | null>(valor);
+  const [pronto, setPronto] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
   const [localizando, setLocalizando] = useState(false);
 
@@ -33,36 +46,14 @@ export function MapaLocalizacao({ valor, aoMudar }: { valor: Ponto | null; aoMud
   useEffect(() => {
     let cancelado = false;
     (async () => {
-      const L = (await import("leaflet")).default;
-      if (cancelado || !caixa.current || mapa.current) return;
-
-      const m = L.map(caixa.current, { scrollWheelZoom: false, zoomControl: true, attributionControl: true });
+      if (!caixa.current) return;
+      const { L, mapa: m } = await montarMapa(caixa.current);
+      if (cancelado) {
+        m.remove();
+        return;
+      }
       mapa.current = m;
-
-      const satelite = L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 19, maxNativeZoom: 18, attribution: "Imagens © Esri" },
-      );
-      const ruas = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "© OpenStreetMap",
-      });
-      satelite.addTo(m);
-      L.control.layers({ Satélite: satelite, Ruas: ruas }, undefined, { position: "topright" }).addTo(m);
-
-      // Escurece tudo que está fora da área e contorna a área em vermelho.
-      const mundo: [number, number][] = [
-        [-89, -179],
-        [-89, 179],
-        [89, 179],
-        [89, -179],
-      ];
-      L.polygon([mundo, AREA], { stroke: false, fillColor: "#061f15", fillOpacity: 0.6, interactive: false }).addTo(m);
-      const contorno = L.polygon(AREA, { color: "#ff3b3b", weight: 3, fill: false, interactive: false }).addTo(m);
-      m.fitBounds(contorno.getBounds(), { padding: [12, 12] });
-      m.setMinZoom(m.getZoom() - 1);
-      m.setMaxBounds(contorno.getBounds().pad(0.6));
-
+      lib.current = L;
       const icone = L.divIcon({ html: PINO, className: "", iconSize: [34, 44], iconAnchor: [17, 43] });
 
       const marcar = (lat: number, lng: number, centralizar = false) => {
@@ -92,15 +83,29 @@ export function MapaLocalizacao({ valor, aoMudar }: { valor: Ponto | null; aoMud
       marcarRef.current = marcar;
       m.on("click", (e) => marcar(e.latlng.lat, e.latlng.lng));
       if (ultimoValido.current) marcar(ultimoValido.current.lat, ultimoValido.current.lng);
+      setPronto(true);
     })();
     return () => {
       cancelado = true;
       mapa.current?.remove();
       mapa.current = null;
       marcador.current = null;
+      destaque.current = null;
       marcarRef.current = null;
     };
   }, []);
+
+  // Quando o CEP aponta uma rua participante, aproxima e destaca a rua.
+  useEffect(() => {
+    const m = mapa.current;
+    const L = lib.current;
+    if (!pronto || !m || !L) return;
+    destaque.current?.remove();
+    destaque.current = null;
+    if (!foco) return;
+    destaque.current = destacarRua(L, m, foco);
+    if (!marcador.current) m.fitBounds(destaque.current.getBounds(), { padding: [30, 30], maxZoom: 18 });
+  }, [foco, pronto]);
 
   function usarMinhaLocalizacao() {
     if (!navigator.geolocation) {

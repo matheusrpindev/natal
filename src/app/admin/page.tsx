@@ -39,6 +39,7 @@ function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) =>
         </p>
         <p className="flex items-center gap-1.5">
           <MapPin size={14} className="shrink-0 text-vermelho" aria-hidden /> {i.rua}, {i.numeroCasa}
+          {i.cep && ` · CEP ${i.cep}`}
           {i.complemento && ` · ${i.complemento}`}
           {i.latitude != null && i.longitude != null && (
             <a

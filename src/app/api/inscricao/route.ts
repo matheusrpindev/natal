@@ -33,6 +33,8 @@ export async function POST(req: Request) {
   const rua = texto(f, "rua", 120);
   const numeroCasa = texto(f, "numeroCasa", 12);
   if (!responsavel || !rua || !numeroCasa) return erro("Preencha nome, rua e número.");
+  const cep = soDigitos(texto(f, "cep", 12));
+  if (cep.length !== 8) return erro("Informe o CEP da casa.");
   const tel = soDigitos(whatsapp);
   if (tel.length < 10 || tel.length > 11) return erro("Informe um WhatsApp válido com DDD.");
   if (!f.get("aceite")) return erro("É preciso aceitar o regulamento.");
@@ -62,6 +64,7 @@ export async function POST(req: Request) {
       responsavel,
       whatsapp: tel,
       email: email || null,
+      cep: `${cep.slice(0, 5)}-${cep.slice(5)}`,
       rua,
       numeroCasa,
       complemento: texto(f, "complemento", 120) || null,

@@ -12,6 +12,7 @@ export interface Inscricao {
   responsavel: string;
   whatsapp: string;
   email: string | null;
+  cep: string | null;
   rua: string;
   numeroCasa: string;
   complemento: string | null;

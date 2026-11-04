@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { MapaArea } from "@/components/MapaArea";
 import { Titulo } from "@/components/Titulo";
 import { DATAS, EVENTO, formatarData } from "@/lib/config";
+import { RUAS } from "@/lib/ruas";
 
 export const metadata: Metadata = { title: "Regulamento" };
 
@@ -15,7 +17,7 @@ const SECOES: { titulo: string; itens: string[] }[] = [
   {
     titulo: "2. Quem pode se inscrever",
     itens: [
-      `Residências localizadas no ${EVENTO.local}, dentro da área mostrada no mapa da inscrição. Cada endereço pode ter uma única inscrição.`,
+      `Residências localizadas no ${EVENTO.local}, dentro da área e nas ruas listadas abaixo. Cada endereço pode ter uma única inscrição.`,
       "Na inscrição, o participante marca no mapa onde fica a casa. Essa marcação é usada para conferir a participação e poderá ser usada num mapa das casas participantes.",
       "A decoração deve estar na fachada, no muro, no quintal ou em janelas, visível da rua.",
       "A inscrição deve ser feita pelo morador ou com autorização dele.",
@@ -63,21 +65,82 @@ const SECOES: { titulo: string; itens: string[] }[] = [
   },
 ];
 
+const ordenar = (lista: typeof RUAS) => [...lista].sort((x, y) => x.nome.localeCompare(y.nome, "pt-BR"));
+const INTEIRAS = ordenar(RUAS.filter((r) => r.situacao === "inteira"));
+const PARCIAIS = ordenar(RUAS.filter((r) => r.situacao === "parcial"));
+
+function Secao({ s }: { s: (typeof SECOES)[number] }) {
+  return (
+    <section>
+      <h2 className="text-xl font-extrabold text-vermelho">{s.titulo}</h2>
+      <ul className="mt-3 list-disc space-y-2 pl-5">
+        {s.itens.map((i) => (
+          <li key={i}>{i}</li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function AreaDoConcurso() {
+  return (
+    <section id="area" className="scroll-mt-6">
+      <h2 className="text-xl font-extrabold text-vermelho">Área do concurso e ruas participantes</h2>
+      <p className="mt-3">
+        Participam as casas dentro do contorno vermelho. Passe o dedo ou o mouse sobre uma rua para ver o nome.
+      </p>
+      <div className="mt-4">
+        <MapaArea />
+      </div>
+      <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-tinta-suave">
+        <span className="flex items-center gap-2">
+          <span className="inline-block h-1.5 w-6 rounded bg-dourado" /> rua inteira na área
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="inline-block h-1.5 w-6 rounded border-t-2 border-dashed border-[#ffb38a]" /> só um trecho na área
+        </span>
+      </p>
+      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+        <div>
+          <h3 className="font-extrabold">Ruas inteiras ({INTEIRAS.length})</h3>
+          <ul className="mt-2 space-y-1 text-sm">
+            {INTEIRAS.map((r) => (
+              <li key={r.nome} className="flex justify-between gap-3 border-b border-borda pb-1">
+                <span>{r.nome}</span>
+                <span className="text-tinta-suave tabular-nums">{r.cep ?? "—"}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 className="font-extrabold">Só um trecho ({PARCIAIS.length})</h3>
+          <p className="mt-1 text-sm text-tinta-suave">Participa só a parte da rua que fica dentro do contorno.</p>
+          <ul className="mt-2 space-y-1 text-sm">
+            {PARCIAIS.map((r) => (
+              <li key={r.nome} className="flex justify-between gap-3 border-b border-borda pb-1">
+                <span>{r.nome}</span>
+                <span className="text-tinta-suave tabular-nums">{r.cep ?? "—"}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function PaginaRegulamento() {
   return (
     <>
       <Titulo titulo="Regulamento" subtitulo={`${EVENTO.nome} ${EVENTO.ano}`} />
       <div className="mx-auto max-w-3xl px-4 py-10">
         <div className="cartao space-y-8 p-6 sm:p-10">
-          {SECOES.map((s) => (
-            <section key={s.titulo}>
-              <h2 className="text-xl font-extrabold text-vermelho">{s.titulo}</h2>
-              <ul className="mt-3 list-disc space-y-2 pl-5">
-                {s.itens.map((i) => (
-                  <li key={i}>{i}</li>
-                ))}
-              </ul>
-            </section>
+          {SECOES.slice(0, 2).map((s) => (
+            <Secao key={s.titulo} s={s} />
+          ))}
+          <AreaDoConcurso />
+          {SECOES.slice(2).map((s) => (
+            <Secao key={s.titulo} s={s} />
           ))}
         </div>
       </div>

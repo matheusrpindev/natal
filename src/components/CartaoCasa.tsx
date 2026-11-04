@@ -9,6 +9,8 @@ export interface CasaPublica {
   rua: string;
   numeroCasa: string;
   descricao: string | null;
+  latitude: number | null;
+  longitude: number | null;
   fotos: string[];
 }
 
@@ -20,6 +22,8 @@ export function paraPublico(i: Inscricao, urlFoto: (c: string) => string): CasaP
     rua: i.rua,
     numeroCasa: i.numeroCasa,
     descricao: i.descricao,
+    latitude: i.latitude ?? null,
+    longitude: i.longitude ?? null,
     fotos: i.fotos.map(urlFoto),
   };
 }

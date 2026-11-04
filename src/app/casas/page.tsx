@@ -3,6 +3,7 @@ import { TreePine } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CartaoCasa } from "@/components/CartaoCasa";
+import { MapaCasas } from "@/components/MapaCasas";
 import { Aviso, Titulo } from "@/components/Titulo";
 import { casasAprovadas } from "@/lib/casas";
 import { faseAtual } from "@/lib/db";
@@ -24,6 +25,11 @@ async function Lista() {
         {casas.length} {casas.length === 1 ? "casa participando" : "casas participando"}. Passeie pelo bairro e confira
         de pertinho!
       </p>
+      {casas.some((c) => c.latitude != null) && (
+        <div className="mb-10">
+          <MapaCasas casas={casas} votacao={fase === "votacao"} />
+        </div>
+      )}
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {casas.map((c) => (
           <CartaoCasa key={c.id} casa={c}>

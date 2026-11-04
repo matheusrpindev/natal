@@ -25,6 +25,7 @@ interface Linha {
   responsavel: string;
   whatsapp: string;
   email: string | null;
+  cep: string | null;
   rua: string;
   numero_casa: string;
   complemento: string | null;
@@ -45,6 +46,7 @@ function deLinha(l: Linha): Inscricao {
     responsavel: l.responsavel,
     whatsapp: l.whatsapp,
     email: l.email,
+    cep: l.cep ?? null,
     rua: l.rua,
     numeroCasa: l.numero_casa,
     complemento: l.complemento,
@@ -78,6 +80,7 @@ export const supabaseStore: Store = {
         responsavel: dados.responsavel,
         whatsapp: dados.whatsapp,
         email: dados.email,
+        cep: dados.cep,
         rua: dados.rua,
         numero_casa: dados.numeroCasa,
         complemento: dados.complemento,

@@ -5,6 +5,7 @@ import { Contagem } from "@/components/Contagem";
 import { Enfeite, Selo } from "@/components/Icones";
 import { Neve } from "@/components/Neve";
 import { Organizador } from "@/components/Organizador";
+import { PodeParticipar } from "@/components/PodeParticipar";
 import { DATAS, EVENTO, formatarData } from "@/lib/config";
 import { faseAtual } from "@/lib/db";
 import { proximoMarco, type Fase } from "@/lib/phase";
@@ -60,6 +61,25 @@ async function Destaque() {
   );
 }
 
+async function SecaoPodeParticipar() {
+  const { fase } = await faseAtual();
+  if (fase !== "em-breve" && fase !== "inscricoes") return null;
+  return (
+    <section id="pode-participar" className="mx-auto max-w-4xl scroll-mt-6 px-4 pb-14">
+      <div className="mb-6 text-center">
+        <h2 className="font-festiva text-4xl font-bold text-vermelho sm:text-5xl">Minha casa pode participar?</h2>
+        <p className="mt-2 text-tinta-suave">
+          Digite o CEP e o número da sua casa para saber se ela está na área do concurso.{" "}
+          <Link href="/regulamento#area" className="font-bold text-verde underline">
+            Ver todas as ruas participantes
+          </Link>
+        </p>
+      </div>
+      <PodeParticipar inscricoesAbertas={fase === "inscricoes"} dataInscricoes={formatarData(DATAS.inscricoesInicio)} />
+    </section>
+  );
+}
+
 export default function Inicio() {
   return (
     <>
@@ -110,6 +130,10 @@ export default function Inicio() {
           ))}
         </ol>
       </section>
+
+      <Suspense fallback={null}>
+        <SecaoPodeParticipar />
+      </Suspense>
 
       <Organizador />
 
