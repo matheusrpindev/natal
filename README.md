@@ -51,5 +51,5 @@ Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (mod
 ## Segurança e privacidade
 
 - O CPF **nunca é salvo**: o banco guarda só um hash (HMAC-SHA256), que garante 1 voto por CPF.
-- Os CPFs são validados pelos dígitos verificadores. Mesmo assim, existem geradores de CPF válido na internet. Para reduzir fraude, a organização pode olhar no painel votos repetidos do mesmo IP (o IP é guardado só como hash) e anular os suspeitos.
+- Os CPFs são validados pelos dígitos verificadores. Mesmo assim, existem geradores de CPF válido na internet. Para auditoria, cada voto registra também o IP (só como hash) e o navegador, consultáveis na tabela `votos` do Supabase.
 - Telefone e e-mail dos inscritos aparecem só no painel da organização.
