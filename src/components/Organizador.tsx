@@ -24,7 +24,9 @@ export function Organizador() {
         </div>
         <div className="p-6 pt-0 text-center md:p-8 md:pl-2 md:text-left">
           <p className="text-sm font-extrabold tracking-[0.2em] text-verde uppercase">Uma iniciativa de</p>
-          <h2 className="font-festiva mt-1 text-4xl font-bold text-vermelho sm:text-5xl">{EVENTO.organizador}</h2>
+          <h2 className="mt-2">
+            <img src="/marcos-logo.webp" alt={EVENTO.organizador} className="mx-auto h-28 w-auto sm:h-32 md:mx-0" />
+          </h2>
           <p className="mt-4 text-lg text-tinta-suave">
             O Natal Iluminado nasceu para valorizar quem capricha na decoração e para unir os vizinhos do Scaffid II na
             época mais bonita do ano. Participe, passeie pelo bairro e ajude a escolher as casas mais iluminadas!
