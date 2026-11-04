@@ -78,48 +78,13 @@ body {
   background: repeating-linear-gradient(-45deg, var(--vermelho) 0 14px, #fff 14px 28px);
 }
 
-/* Luzinhas de Natal */
-.luzes {
-  display: flex;
-  justify-content: center;
-  gap: 30px;
-  height: 34px;
-  overflow: hidden;
-  position: relative;
-}
-.luzes::before {
-  content: "";
-  position: absolute;
-  inset: 0 0 auto 0;
-  height: 14px;
-  border-bottom: 2px solid #1a1a1a;
-  border-radius: 0 0 50% 50% / 0 0 100% 100%;
-}
-.luz {
-  flex-shrink: 0;
-  position: relative;
-  top: 12px;
-  width: 11px;
-  height: 18px;
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-  background: var(--cor);
-  box-shadow: 0 2px 14px 3px var(--cor);
-  animation: piscar 1.6s ease-in-out infinite;
-  animation-delay: var(--atraso);
-}
-.luz::before {
-  content: "";
-  position: absolute;
-  top: -5px;
-  left: 2px;
-  width: 7px;
-  height: 6px;
-  border-radius: 2px;
-  background: #333;
+/* Luzinhas de Natal (ver components/Luzes.tsx) */
+.lampada {
+  animation: piscar 2.6s ease-in-out infinite;
 }
 @keyframes piscar {
-  0%, 100% { opacity: 1; box-shadow: 0 2px 16px 4px var(--cor); }
-  50% { opacity: 0.35; box-shadow: none; }
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
 }
 
 /* Neve caindo */
@@ -191,6 +156,6 @@ body {
 :focus-visible { outline: 3px solid var(--dourado); outline-offset: 2px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .luz, .floco { animation: none; }
+  .lampada, .floco { animation: none; }
   .neve { display: none; }
 }
