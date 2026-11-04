@@ -15,8 +15,13 @@ create table if not exists inscricoes (
   complemento text,
   titulo text,
   descricao text,
+  latitude double precision,
+  longitude double precision,
   fotos text[] not null default '{}'
 );
+-- Para bancos criados antes do mapa:
+alter table inscricoes add column if not exists latitude double precision;
+alter table inscricoes add column if not exists longitude double precision;
 
 create table if not exists votos (
   id bigint generated always as identity primary key,

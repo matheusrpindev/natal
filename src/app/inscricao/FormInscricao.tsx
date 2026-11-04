@@ -1,10 +1,11 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { Camera, CircleCheck, House, LoaderCircle, Sparkles, User, X } from "lucide-react";
+import { Camera, CircleCheck, House, LoaderCircle, MapPinned, Sparkles, User, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Selo } from "@/components/Icones";
+import { MapaLocalizacao, type Ponto } from "@/components/MapaLocalizacao";
 import { mascararTelefone } from "@/lib/cpf";
 import { EVENTO } from "@/lib/config";
 import { reduzirImagem } from "@/lib/reduzirImagem";
@@ -27,6 +28,7 @@ function Campo({ rotulo, dica, children }: { rotulo: string; dica?: string; chil
 export function FormInscricao() {
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [whats, setWhats] = useState("");
+  const [local, setLocal] = useState<Ponto | null>(null);
   const [processando, setProcessando] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -53,6 +55,11 @@ export function FormInscricao() {
   async function enviar(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErro(null);
+    if (!local) {
+      setErro("Marque no mapa onde fica a sua casa.");
+      document.getElementById("onde-fica")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     if (fotos.length === 0) {
       setErro("Envie pelo menos uma foto da decoração.");
       return;
@@ -135,6 +142,18 @@ export function FormInscricao() {
         <Campo rotulo="Complemento / ponto de referência">
           <input name="complemento" maxLength={120} className="campo" />
         </Campo>
+      </fieldset>
+
+      <fieldset id="onde-fica" className="flex flex-col gap-3">
+        <legend className="mb-2 flex items-center gap-3 text-xl font-extrabold">
+          <Selo icone={MapPinned} tamanho={40} /> Onde fica a casa *
+        </legend>
+        <p className="text-sm text-tinta-suave">
+          Só participam as casas dentro do contorno vermelho. Aproxime o mapa e toque em cima do telhado da sua casa.
+        </p>
+        <MapaLocalizacao valor={local} aoMudar={setLocal} />
+        <input type="hidden" name="latitude" value={local?.lat ?? ""} />
+        <input type="hidden" name="longitude" value={local?.lng ?? ""} />
       </fieldset>
 
       <fieldset className="flex flex-col gap-4">

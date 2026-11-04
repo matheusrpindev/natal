@@ -40,6 +40,16 @@ function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) =>
         <p className="flex items-center gap-1.5">
           <MapPin size={14} className="shrink-0 text-vermelho" aria-hidden /> {i.rua}, {i.numeroCasa}
           {i.complemento && ` · ${i.complemento}`}
+          {i.latitude != null && i.longitude != null && (
+            <a
+              href={`https://www.google.com/maps?q=${i.latitude},${i.longitude}`}
+              target="_blank"
+              rel="noreferrer"
+              className="ml-1 font-bold text-verde underline"
+            >
+              ver no mapa
+            </a>
+          )}
         </p>
         <p className="flex flex-wrap items-center gap-1.5">
           <User size={14} className="shrink-0 text-verde" aria-hidden /> {i.responsavel} ·{" "}

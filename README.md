@@ -45,6 +45,7 @@ Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (mod
 
 - **Datas, nome e organizador**: `src/lib/config.ts`
 - **Fonte dos títulos (P22 Yule Heavy Snow)**: coloque o arquivo em `public/fonts/p22-yule-heavy-snow.woff2` (veja `public/fonts/LEIA-ME.txt`). Sem o arquivo, os títulos usam a Mountains of Christmas.
+- **Área do concurso (mapa da inscrição)**: contorno em `src/lib/area.ts`, reproduzido do desenho no Google Earth. Para deixar exato, exporte o desenho como KML e troque os pontos. A inscrição só é aceita com a casa marcada dentro da área (conferido também no servidor).
 - **Foto do Marcos**: salve em `public/marcos.jpg` (aparece na seção "Uma iniciativa de" da página inicial).
 - **Logo**: salve em `public/logo.png` e siga o comentário em `src/components/Logo.tsx`
 - **Prêmios**: seção "Prêmios" em `src/app/page.tsx`

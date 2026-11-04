@@ -1,3 +1,4 @@
+import { dentroDaArea } from "@/lib/area";
 import { EVENTO } from "@/lib/config";
 import { soDigitos } from "@/lib/cpf";
 import { db, faseAtual } from "@/lib/db";
@@ -38,6 +39,13 @@ export async function POST(req: Request) {
   const email = texto(f, "email", 160);
   if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return erro("E-mail inválido.");
 
+  const latitude = Number(texto(f, "latitude", 30));
+  const longitude = Number(texto(f, "longitude", 30));
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || (latitude === 0 && longitude === 0)) {
+    return erro("Marque no mapa onde fica a sua casa.");
+  }
+  if (!dentroDaArea(latitude, longitude)) return erro("A casa marcada está fora da área do concurso.");
+
   const arquivos = f.getAll("fotos").filter((x): x is File => x instanceof File && x.size > 0);
   if (arquivos.length === 0) return erro("Envie pelo menos uma foto.");
   if (arquivos.length > EVENTO.maxFotos) return erro(`Envie no máximo ${EVENTO.maxFotos} fotos.`);
@@ -59,6 +67,8 @@ export async function POST(req: Request) {
       complemento: texto(f, "complemento", 120) || null,
       titulo: texto(f, "titulo", 60) || null,
       descricao: texto(f, "descricao", 500) || null,
+      latitude,
+      longitude,
     },
     fotos,
   );

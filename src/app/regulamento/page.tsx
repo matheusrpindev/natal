@@ -15,7 +15,8 @@ const SECOES: { titulo: string; itens: string[] }[] = [
   {
     titulo: "2. Quem pode se inscrever",
     itens: [
-      `Residências localizadas no ${EVENTO.local}. Cada endereço pode ter uma única inscrição.`,
+      `Residências localizadas no ${EVENTO.local}, dentro da área mostrada no mapa da inscrição. Cada endereço pode ter uma única inscrição.`,
+      "Na inscrição, o participante marca no mapa onde fica a casa. Essa marcação é usada para conferir a participação e poderá ser usada num mapa das casas participantes.",
       "A decoração deve estar na fachada, no muro, no quintal ou em janelas, visível da rua.",
       "A inscrição deve ser feita pelo morador ou com autorização dele.",
     ],

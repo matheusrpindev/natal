@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     const store = await db();
     const lista = await store.listarInscricoes();
     conteudo = csv([
-      ["Protocolo", "Status", "Número", "Responsável", "WhatsApp", "E-mail", "Rua", "Nº", "Complemento", "Nome da casa", "Enviada em"],
+      ["Protocolo", "Status", "Número", "Responsável", "WhatsApp", "E-mail", "Rua", "Nº", "Complemento", "Nome da casa", "Latitude", "Longitude", "Enviada em"],
       ...lista.map((i) => [
         i.protocolo,
         i.status,
@@ -38,6 +38,8 @@ export async function GET(req: Request) {
         i.numeroCasa,
         i.complemento,
         i.titulo,
+        i.latitude,
+        i.longitude,
         i.criadoEm,
       ]),
     ]);

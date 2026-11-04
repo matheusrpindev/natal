@@ -17,6 +17,9 @@ export interface Inscricao {
   complemento: string | null;
   titulo: string | null;
   descricao: string | null;
+  /** Ponto marcado no mapa (dentro da área do concurso). */
+  latitude: number | null;
+  longitude: number | null;
   /** Caminhos das fotos no armazenamento. */
   fotos: string[];
 }

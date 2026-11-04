@@ -30,6 +30,8 @@ interface Linha {
   complemento: string | null;
   titulo: string | null;
   descricao: string | null;
+  latitude: number | null;
+  longitude: number | null;
   fotos: string[];
 }
 
@@ -48,6 +50,8 @@ function deLinha(l: Linha): Inscricao {
     complemento: l.complemento,
     titulo: l.titulo,
     descricao: l.descricao,
+    latitude: l.latitude ?? null,
+    longitude: l.longitude ?? null,
     fotos: l.fotos ?? [],
   };
 }
@@ -79,6 +83,8 @@ export const supabaseStore: Store = {
         complemento: dados.complemento,
         titulo: dados.titulo,
         descricao: dados.descricao,
+        latitude: dados.latitude,
+        longitude: dados.longitude,
         fotos: caminhos,
       })
       .select()
