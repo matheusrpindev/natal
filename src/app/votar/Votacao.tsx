@@ -1,9 +1,11 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
+import { CircleCheck, ShieldCheck, Vote } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CartaoCasa, nomeCasa, type CasaPublica } from "@/components/CartaoCasa";
+import { Selo } from "@/components/Icones";
 import { cpfValido, mascararCpf } from "@/lib/cpf";
 
 export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: string | null }) {
@@ -14,9 +16,7 @@ export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: str
   if (confirmado) {
     return (
       <div className="cartao mx-auto max-w-xl p-8 text-center">
-        <div className="text-6xl" aria-hidden>
-          🎅
-        </div>
+        <Selo icone={CircleCheck} cor="verde" tamanho={72} />
         <h2 className="font-festiva mt-3 text-4xl font-bold text-verde">Voto registrado!</h2>
         <p className="mt-3 text-lg">
           Você votou em <strong>{nomeCasa(confirmado)}</strong>. Obrigado por participar do Natal Iluminado!
@@ -58,7 +58,7 @@ export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: str
         {filtradas.map((c) => (
           <CartaoCasa key={c.id} casa={c}>
             <button onClick={() => setEscolhida(c)} className="btn btn-vermelho w-full">
-              Votar nesta casa 🗳️
+              <Vote size={18} aria-hidden /> Votar nesta casa
             </button>
           </CartaoCasa>
         ))}
@@ -152,8 +152,8 @@ function JanelaVoto({ casa, fechar, concluido }: { casa: CasaPublica; fechar: ()
             aria-invalid={cpfInvalido}
           />
           {cpfInvalido && <span className="text-sm font-bold text-vermelho">CPF inválido. Confira os números.</span>}
-          <span className="text-xs text-tinta-suave">
-            🔒 O CPF é usado só para garantir um voto por pessoa e é guardado de forma criptografada.
+          <span className="flex items-start gap-1.5 text-xs text-tinta-suave">
+            <ShieldCheck size={14} className="mt-px shrink-0 text-verde" aria-hidden /> O CPF é usado só para garantir um voto por pessoa e é guardado de forma criptografada.
           </span>
         </label>
         <input type="text" name="site" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />

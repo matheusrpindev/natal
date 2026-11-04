@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { User } from "lucide-react";
 import { EVENTO } from "@/lib/config";
 
 /** Foto do organizador: salve em public/marcos.jpg (fundo branco fica ótimo). */
@@ -15,8 +16,8 @@ export function Organizador() {
           {temFoto ? (
             <img src={FOTO} alt={`${EVENTO.organizador} de gorro de Papai Noel`} className="h-80 w-full object-contain object-bottom md:h-full" />
           ) : (
-            <div className="flex h-64 w-full items-center justify-center text-8xl" aria-hidden>
-              🎅
+            <div className="flex h-64 w-full items-center justify-center text-borda" aria-hidden>
+              <User size={96} strokeWidth={1.5} />
             </div>
           )}
           <div className="bengala absolute inset-x-0 bottom-0 h-2 md:inset-y-0 md:right-0 md:left-auto md:h-auto md:w-2" />

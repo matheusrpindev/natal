@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, X } from "lucide-react";
 import { useTransition } from "react";
 import type { StatusInscricao } from "@/lib/db/types";
 import { mudarStatus } from "./actions";
@@ -14,7 +15,7 @@ export function BotoesStatus({ id, status }: { id: string; status: StatusInscric
     <div className="flex flex-wrap gap-2">
       {status !== "aprovada" && (
         <button disabled={pendente} onClick={() => mudar("aprovada")} className="btn btn-verde px-4 py-2 text-sm">
-          ✓ Aprovar
+          <Check size={16} aria-hidden /> Aprovar
         </button>
       )}
       {status !== "recusada" && (
@@ -23,7 +24,7 @@ export function BotoesStatus({ id, status }: { id: string; status: StatusInscric
           onClick={() => mudar("recusada", status === "aprovada" ? "Tirar esta casa do concurso?" : undefined)}
           className="btn btn-contorno px-4 py-2 text-sm text-vermelho"
         >
-          ✕ Recusar
+          <X size={16} aria-hidden /> Recusar
         </button>
       )}
       {status !== "pendente" && (

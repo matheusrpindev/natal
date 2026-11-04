@@ -1,8 +1,10 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
+import { Camera, CircleCheck, House, LoaderCircle, Sparkles, User, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { Selo } from "@/components/Icones";
 import { mascararTelefone } from "@/lib/cpf";
 import { EVENTO } from "@/lib/config";
 import { reduzirImagem } from "@/lib/reduzirImagem";
@@ -74,9 +76,7 @@ export function FormInscricao() {
   if (sucesso) {
     return (
       <div className="cartao p-8 text-center">
-        <div className="text-6xl" aria-hidden>
-          🎉
-        </div>
+        <Selo icone={CircleCheck} cor="verde" tamanho={72} />
         <h2 className="font-festiva mt-3 text-4xl font-bold text-verde">Inscrição recebida!</h2>
         <p className="mt-3 text-lg">
           Seu protocolo é <strong className="rounded bg-dourado/30 px-2 py-0.5 font-mono">{sucesso.protocolo}</strong>
@@ -95,7 +95,9 @@ export function FormInscricao() {
   return (
     <form onSubmit={enviar} className="cartao flex flex-col gap-6 p-6 sm:p-8">
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-2 text-xl font-extrabold text-vermelho">👤 Responsável</legend>
+        <legend className="mb-2 flex items-center gap-3 text-xl font-extrabold">
+          <Selo icone={User} tamanho={40} /> Responsável
+        </legend>
         <Campo rotulo="Nome completo *">
           <input name="responsavel" required maxLength={120} className="campo" autoComplete="name" />
         </Campo>
@@ -119,7 +121,9 @@ export function FormInscricao() {
       </fieldset>
 
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-2 text-xl font-extrabold text-vermelho">🏠 Endereço da casa</legend>
+        <legend className="mb-2 flex items-center gap-3 text-xl font-extrabold">
+          <Selo icone={House} tamanho={40} /> Endereço da casa
+        </legend>
         <div className="grid gap-4 sm:grid-cols-[1fr_8rem]">
           <Campo rotulo="Rua *">
             <input name="rua" required maxLength={120} className="campo" autoComplete="address-line1" />
@@ -134,7 +138,9 @@ export function FormInscricao() {
       </fieldset>
 
       <fieldset className="flex flex-col gap-4">
-        <legend className="mb-2 text-xl font-extrabold text-vermelho">✨ A decoração</legend>
+        <legend className="mb-2 flex items-center gap-3 text-xl font-extrabold">
+          <Selo icone={Sparkles} tamanho={40} /> A decoração
+        </legend>
         <Campo rotulo="Nome da casa (opcional)" dica='Ex.: "Casa da Família Silva" ou "Vila do Papai Noel".'>
           <input name="titulo" maxLength={60} className="campo" />
         </Campo>
@@ -159,15 +165,13 @@ export function FormInscricao() {
                   className="absolute top-1.5 right-1.5 flex h-8 w-8 items-center justify-center rounded-full bg-black/70 text-white"
                   aria-label={`Remover foto ${i + 1}`}
                 >
-                  ✕
+                  <X size={16} />
                 </button>
               </div>
             ))}
             {fotos.length < EVENTO.maxFotos && (
               <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-verde/40 bg-verde/5 text-center text-sm font-bold text-verde hover:bg-verde/10">
-                <span className="text-3xl" aria-hidden>
-                  {processando ? "⏳" : "📷"}
-                </span>
+                {processando ? <LoaderCircle size={28} className="animate-spin" aria-hidden /> : <Camera size={28} aria-hidden />}
                 {processando ? "Processando…" : "Adicionar foto"}
                 <input
                   type="file"
@@ -211,7 +215,7 @@ export function FormInscricao() {
       )}
 
       <button type="submit" disabled={enviando || processando} className="btn btn-vermelho self-center text-lg">
-        {enviando ? "Enviando…" : "Enviar inscrição 🎄"}
+        {enviando ? "Enviando…" : "Enviar inscrição"}
       </button>
     </form>
   );

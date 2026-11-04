@@ -1,7 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+import { Ban, CalendarDays, CircleCheck, Hourglass, MapPin, TriangleAlert, Trophy, User } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { nomeCasa } from "@/components/CartaoCasa";
+import { Selo } from "@/components/Icones";
 import { estaLogado } from "@/lib/admin";
 import { formatarDataHora } from "@/lib/config";
 import { db, faseAtual, usandoSupabase, type Inscricao, type StatusInscricao } from "@/lib/db";
@@ -14,10 +16,10 @@ import { SeletorFase } from "./SeletorFase";
 
 export const metadata: Metadata = { title: "Organização", robots: { index: false } };
 
-const GRUPOS: { status: StatusInscricao; titulo: string }[] = [
-  { status: "pendente", titulo: "⏳ Aguardando aprovação" },
-  { status: "aprovada", titulo: "✅ Aprovadas" },
-  { status: "recusada", titulo: "🚫 Recusadas" },
+const GRUPOS: { status: StatusInscricao; titulo: string; icone: typeof Ban; cor: "dourado" | "verde" | "vermelho" }[] = [
+  { status: "pendente", titulo: "Aguardando aprovação", icone: Hourglass, cor: "dourado" },
+  { status: "aprovada", titulo: "Aprovadas", icone: CircleCheck, cor: "verde" },
+  { status: "recusada", titulo: "Recusadas", icone: Ban, cor: "vermelho" },
 ];
 
 function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) => string }) {
@@ -35,12 +37,12 @@ function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) =>
           {i.numero != null && <span className="mr-2 rounded bg-vermelho px-2 text-white">#{i.numero}</span>}
           {i.numero != null ? nomeCasa({ numero: i.numero, titulo: i.titulo }) : i.titulo || "(sem nome)"}
         </p>
-        <p>
-          📍 {i.rua}, {i.numeroCasa}
+        <p className="flex items-center gap-1.5">
+          <MapPin size={14} className="shrink-0 text-vermelho" aria-hidden /> {i.rua}, {i.numeroCasa}
           {i.complemento && ` · ${i.complemento}`}
         </p>
-        <p>
-          👤 {i.responsavel} ·{" "}
+        <p className="flex flex-wrap items-center gap-1.5">
+          <User size={14} className="shrink-0 text-verde" aria-hidden /> {i.responsavel} ·{" "}
           <a href={`https://wa.me/55${i.whatsapp}`} target="_blank" rel="noreferrer" className="font-bold text-verde underline">
             WhatsApp {i.whatsapp}
           </a>
@@ -79,9 +81,10 @@ async function Painel() {
       </div>
 
       {!usandoSupabase && (
-        <p className="rounded-xl bg-dourado/25 p-4 text-sm">
-          ⚠️ <strong>Modo de teste:</strong> os dados estão sendo salvos em arquivo local (<code>.data/</code>). Configure o
-          Supabase antes de publicar o site.
+        <p className="flex items-start gap-2 rounded-xl bg-dourado/25 p-4 text-sm">
+          <TriangleAlert size={18} className="shrink-0 text-dourado-escuro" aria-hidden />
+          <span><strong>Modo de teste:</strong> os dados estão sendo salvos em arquivo local (<code>.data/</code>). Configure o
+          Supabase antes de publicar o site.</span>
         </p>
       )}
 
@@ -100,7 +103,9 @@ async function Painel() {
       </div>
 
       <section className="cartao p-6">
-        <h2 className="text-xl font-extrabold">🗓️ Fase do concurso</h2>
+        <h2 className="flex items-center gap-3 text-xl font-extrabold">
+          <Selo icone={CalendarDays} cor="verde" tamanho={40} /> Fase do concurso
+        </h2>
         <p className="mt-1 text-sm text-tinta-suave">
           Você decide quando cada fase começa. O site mostra para o público só o que vale na fase atual. Clique numa fase
           para mudar.
@@ -110,7 +115,9 @@ async function Painel() {
 
       <section className="cartao p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-xl font-extrabold">🏆 Apuração ao vivo</h2>
+          <h2 className="flex items-center gap-3 text-xl font-extrabold">
+            <Selo icone={Trophy} cor="dourado" tamanho={40} /> Apuração ao vivo
+          </h2>
           <div className="flex gap-2">
             <a href="/api/admin/exportar?tipo=ranking" className="btn btn-contorno px-4 py-2 text-sm text-verde">
               Baixar ranking (CSV)
@@ -142,8 +149,8 @@ async function Painel() {
         const itens = inscricoes.filter((i) => i.status === g.status);
         return (
           <section key={g.status}>
-            <h2 className="text-xl font-extrabold">
-              {g.titulo} <span className="text-tinta-suave">({itens.length})</span>
+            <h2 className="flex items-center gap-3 text-xl font-extrabold">
+              <Selo icone={g.icone} cor={g.cor} tamanho={36} /> {g.titulo} <span className="text-tinta-suave">({itens.length})</span>
             </h2>
             {itens.length === 0 ? (
               <p className="mt-2 text-tinta-suave">Nenhuma.</p>

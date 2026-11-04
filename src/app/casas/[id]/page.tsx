@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { MapPin, Vote } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
@@ -23,13 +24,13 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         </span>
         <h1 className="font-festiva text-4xl font-bold text-verde sm:text-5xl">{nomeCasa(casa)}</h1>
       </div>
-      <p className="mt-2 text-lg text-tinta-suave">
-        📍 {casa.rua}, {casa.numeroCasa}
+      <p className="mt-2 flex items-center gap-1.5 text-lg text-tinta-suave">
+        <MapPin size={18} className="text-vermelho" aria-hidden /> {casa.rua}, {casa.numeroCasa}
       </p>
       {casa.descricao && <p className="mt-4 text-lg">{casa.descricao}</p>}
       {fase === "votacao" && (
         <Link href={`/votar?casa=${casa.id}`} className="btn btn-vermelho mt-6">
-          Votar nesta casa 🗳️
+          <Vote size={18} aria-hidden /> Votar nesta casa
         </Link>
       )}
       <div className="mt-8 grid gap-4">

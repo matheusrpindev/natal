@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TreePine } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { CartaoCasa } from "@/components/CartaoCasa";
@@ -12,7 +13,7 @@ async function Lista() {
   const [casas, { fase }] = await Promise.all([casasAprovadas(), faseAtual()]);
   if (casas.length === 0) {
     return (
-      <Aviso emoji="🎄" titulo="Nenhuma casa ainda">
+      <Aviso icone={TreePine} titulo="Nenhuma casa ainda">
         As casas aparecem aqui assim que a inscrição é aprovada pela organização.
       </Aviso>
     );
@@ -21,7 +22,7 @@ async function Lista() {
     <>
       <p className="mb-6 text-center text-tinta-suave">
         {casas.length} {casas.length === 1 ? "casa participando" : "casas participando"}. Passeie pelo bairro e confira
-        de pertinho! ✨
+        de pertinho!
       </p>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {casas.map((c) => (

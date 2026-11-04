@@ -1,3 +1,5 @@
+import type { LucideIcon } from "lucide-react";
+import { Selo } from "./Icones";
 import { Neve } from "./Neve";
 
 /** Faixa de título usada no topo das páginas internas. */
@@ -13,12 +15,10 @@ export function Titulo({ titulo, subtitulo }: { titulo: string; subtitulo?: stri
   );
 }
 
-export function Aviso({ emoji, titulo, children }: { emoji: string; titulo: string; children?: React.ReactNode }) {
+export function Aviso({ icone, titulo, children }: { icone: LucideIcon; titulo: string; children?: React.ReactNode }) {
   return (
     <div className="cartao mx-auto max-w-xl p-8 text-center">
-      <div className="text-5xl" aria-hidden>
-        {emoji}
-      </div>
+      <Selo icone={icone} tamanho={64} />
       <h2 className="font-festiva mt-3 text-3xl font-bold text-vermelho">{titulo}</h2>
       {children && <div className="mt-3 text-tinta-suave">{children}</div>}
     </div>

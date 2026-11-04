@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Hourglass, Lock, TreePine } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Aviso, Titulo } from "@/components/Titulo";
@@ -13,7 +14,7 @@ async function Conteudo({ searchParams }: { searchParams: Promise<{ casa?: strin
   const { fase } = await faseAtual();
   if (fase === "em-breve" || fase === "inscricoes") {
     return (
-      <Aviso emoji="⏳" titulo="A votação ainda não começou">
+      <Aviso icone={Hourglass} titulo="A votação ainda não começou">
         A votação vai de <strong>{formatarData(DATAS.votacaoInicio)}</strong> a{" "}
         <strong>{formatarData(DATAS.votacaoFim)}</strong>. Enquanto isso,{" "}
         <Link href="/casas" className="font-bold text-verde underline">
@@ -25,7 +26,7 @@ async function Conteudo({ searchParams }: { searchParams: Promise<{ casa?: strin
   }
   if (fase !== "votacao") {
     return (
-      <Aviso emoji="🔒" titulo="Votação encerrada">
+      <Aviso icone={Lock} titulo="Votação encerrada">
         Obrigado a todos que votaram! O resultado sai no dia <strong>{formatarData(DATAS.resultado)}</strong>.{" "}
         {fase === "resultado" && (
           <Link href="/resultado" className="font-bold text-verde underline">
@@ -36,7 +37,7 @@ async function Conteudo({ searchParams }: { searchParams: Promise<{ casa?: strin
     );
   }
   const casas = await casasAprovadas();
-  if (casas.length === 0) return <Aviso emoji="🎄" titulo="Nenhuma casa na votação ainda" />;
+  if (casas.length === 0) return <Aviso icone={TreePine} titulo="Nenhuma casa na votação ainda" />;
   const { casa } = await searchParams;
   return <Votacao casas={casas} inicial={typeof casa === "string" ? casa : null} />;
 }

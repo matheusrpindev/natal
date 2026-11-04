@@ -1,7 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
+import { Gift, TreePine } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { nomeCasa } from "@/components/CartaoCasa";
+import { Enfeite } from "@/components/Icones";
 import { Aviso, Titulo } from "@/components/Titulo";
 import { DATAS, formatarData } from "@/lib/config";
 import { faseAtual } from "@/lib/db";
@@ -9,20 +11,19 @@ import { ranking } from "@/lib/ranking";
 
 export const metadata: Metadata = { title: "Resultado" };
 
-const MEDALHA: Record<number, string> = { 1: "🥇", 2: "🥈", 3: "🥉" };
 
 async function Conteudo() {
   const { fase } = await faseAtual();
   if (fase !== "resultado") {
     return (
-      <Aviso emoji="🎁" titulo="O resultado ainda é segredo!">
+      <Aviso icone={Gift} titulo="O resultado ainda é segredo!">
         A divulgação será no dia <strong>{formatarData(DATAS.resultado)}</strong>. Até lá, nem o Papai Noel sabe quem
-        ganhou. 🤫
+        ganhou.
       </Aviso>
     );
   }
   const { lista, total } = await ranking();
-  if (lista.length === 0) return <Aviso emoji="🎄" titulo="Nenhuma casa participou" />;
+  if (lista.length === 0) return <Aviso icone={TreePine} titulo="Nenhuma casa participou" />;
   const podio = lista.filter((c) => c.posicao <= 3);
   const demais = lista.filter((c) => c.posicao > 3);
   return (
@@ -35,7 +36,9 @@ async function Conteudo() {
           >
             <div className="relative aspect-[4/3] bg-verde-escuro">
               {c.casa.fotos[0] && <img src={c.casa.fotos[0]} alt="" className="h-full w-full object-cover" />}
-              <span className="absolute top-3 left-3 text-5xl drop-shadow-lg">{MEDALHA[c.posicao]}</span>
+              <span className="absolute top-2 left-3 drop-shadow-lg">
+                <Enfeite posicao={c.posicao as 1 | 2 | 3} tamanho={c.posicao === 1 ? 56 : 46} />
+              </span>
             </div>
             <div className="p-5 text-center">
               <p className="text-sm font-extrabold tracking-widest text-vermelho uppercase">{c.posicao}º lugar</p>
@@ -67,7 +70,7 @@ async function Conteudo() {
         </ol>
       )}
       <p className="mt-8 text-center text-tinta-suave">
-        Total de {total} votos. Obrigado a todas as famílias que iluminaram o Scaffid II! ✨
+        Total de {total} votos. Obrigado a todas as famílias que iluminaram o Scaffid II!
       </p>
     </>
   );

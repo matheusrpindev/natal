@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Hourglass, Lock } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Aviso, Titulo } from "@/components/Titulo";
@@ -12,7 +13,7 @@ async function Conteudo() {
   const { fase } = await faseAtual();
   if (fase === "em-breve") {
     return (
-      <Aviso emoji="⏳" titulo="Inscrições em breve">
+      <Aviso icone={Hourglass} titulo="Inscrições em breve">
         As inscrições abrem no dia <strong>{formatarData(DATAS.inscricoesInicio)}</strong> e vão até{" "}
         <strong>{formatarData(DATAS.inscricoesFim)}</strong>. Aproveite para caprichar na decoração!
       </Aviso>
@@ -20,7 +21,7 @@ async function Conteudo() {
   }
   if (fase !== "inscricoes") {
     return (
-      <Aviso emoji="🔒" titulo="Inscrições encerradas">
+      <Aviso icone={Lock} titulo="Inscrições encerradas">
         As inscrições terminaram em {formatarData(DATAS.inscricoesFim)}.{" "}
         <Link href="/casas" className="font-bold text-verde underline">
           Conheça as casas participantes

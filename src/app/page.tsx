@@ -1,6 +1,8 @@
+import { ArrowRight, ClipboardPen, Lightbulb, Trophy, Vote } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Contagem } from "@/components/Contagem";
+import { Enfeite, Selo } from "@/components/Icones";
 import { Neve } from "@/components/Neve";
 import { Organizador } from "@/components/Organizador";
 import { DATAS, EVENTO, formatarData } from "@/lib/config";
@@ -9,19 +11,22 @@ import { proximoMarco, type Fase } from "@/lib/phase";
 
 const ETAPAS = [
   {
-    emoji: "📝",
+    icone: ClipboardPen,
+    cor: "vermelho" as const,
     titulo: "Inscrições",
     quando: `${formatarData(DATAS.inscricoesInicio)} a ${formatarData(DATAS.inscricoesFim)}`,
     texto: "Monte sua decoração, tire fotos caprichadas e inscreva sua casa aqui no site.",
   },
   {
-    emoji: "🗳️",
+    icone: Vote,
+    cor: "verde" as const,
     titulo: "Votação",
     quando: `${formatarData(DATAS.votacaoInicio)} a ${formatarData(DATAS.votacaoFim)}`,
     texto: "Qualquer pessoa pode votar: é um voto por CPF. Passeie pelo bairro e escolha a sua favorita!",
   },
   {
-    emoji: "🏆",
+    icone: Trophy,
+    cor: "dourado" as const,
     titulo: "Resultado",
     quando: formatarData(DATAS.resultado),
     texto: "Divulgação das casas mais iluminadas do Scaffid II e entrega dos prêmios.",
@@ -47,7 +52,7 @@ async function Destaque() {
         <div className="flex flex-col items-center gap-4">
           <p className="text-lg font-bold text-white">{chamada.texto}</p>
           <Link href={chamada.href} className="btn btn-dourado text-lg">
-            {chamada.rotulo} →
+            {chamada.rotulo} <ArrowRight size={20} aria-hidden />
           </Link>
         </div>
       )}
@@ -97,9 +102,7 @@ export default function Inicio() {
               <span className="absolute -top-4 left-6 flex h-9 w-9 items-center justify-center rounded-full bg-verde text-lg font-black text-white shadow-md">
                 {i + 1}
               </span>
-              <div className="text-4xl" aria-hidden>
-                {e.emoji}
-              </div>
+              <Selo icone={e.icone} cor={e.cor} />
               <h3 className="mt-3 text-xl font-extrabold">{e.titulo}</h3>
               <p className="mt-1 font-bold text-vermelho">{e.quando}</p>
               <p className="mt-2 text-tinta-suave">{e.texto}</p>
@@ -115,13 +118,15 @@ export default function Inicio() {
           <div>
             <h2 className="font-festiva text-4xl font-bold text-dourado sm:text-5xl">Prêmios</h2>
             <p className="mt-3 max-w-2xl text-lg text-white/90">
-              Os prêmios serão anunciados em breve. Fique de olho aqui no site e nos grupos do bairro! 🎁
+              Os prêmios serão anunciados em breve. Fique de olho aqui no site e nos grupos do bairro!
             </p>
           </div>
-          <div className="flex gap-4 text-5xl sm:text-6xl" aria-hidden>
-            <span>🥇</span>
-            <span>🥈</span>
-            <span>🥉</span>
+          <div className="flex items-start justify-center gap-5" aria-hidden>
+            <Enfeite posicao={2} tamanho={72} />
+            <span className="-mt-2">
+              <Enfeite posicao={1} tamanho={92} />
+            </span>
+            <Enfeite posicao={3} tamanho={72} />
           </div>
         </div>
       </section>
@@ -129,7 +134,9 @@ export default function Inicio() {
       <section className="mx-auto max-w-6xl px-4 py-14">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="cartao p-6">
-            <h3 className="text-xl font-extrabold">💡 Dicas para a sua decoração</h3>
+            <h3 className="flex items-center gap-3 text-xl font-extrabold">
+              <Selo icone={Lightbulb} cor="dourado" tamanho={40} /> Dicas para a sua decoração
+            </h3>
             <ul className="mt-3 list-disc space-y-1.5 pl-5 text-tinta-suave">
               <li>A decoração precisa estar visível da rua.</li>
               <li>Tire fotos à noite, com as luzes acesas, e uma de dia para mostrar os detalhes.</li>
@@ -138,7 +145,9 @@ export default function Inicio() {
             </ul>
           </div>
           <div className="cartao p-6">
-            <h3 className="text-xl font-extrabold">🗳️ Sobre a votação</h3>
+            <h3 className="flex items-center gap-3 text-xl font-extrabold">
+              <Selo icone={Vote} cor="verde" tamanho={40} /> Sobre a votação
+            </h3>
             <ul className="mt-3 list-disc space-y-1.5 pl-5 text-tinta-suave">
               <li>Qualquer pessoa pode votar, morando ou não no bairro.</li>
               <li>Cada CPF vale um voto. Não é possível trocar o voto depois.</li>

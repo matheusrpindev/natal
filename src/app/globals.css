@@ -91,11 +91,11 @@ body {
 .floco {
   position: absolute;
   top: -12px;
-  color: #fff;
-  user-select: none;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 0 6px 1px #ffffff66;
   pointer-events: none;
   animation: cair linear infinite;
-  text-shadow: 0 0 6px #fff8;
 }
 @keyframes cair {
   0% { transform: translate3d(0, -10px, 0) rotate(0deg); }
