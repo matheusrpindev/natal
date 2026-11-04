@@ -6,6 +6,7 @@ import type { FotoUpload } from "@/lib/db/types";
 
 const TIPOS = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_BYTES = 3 * 1024 * 1024;
+const MAX_MINI = 400 * 1024;
 
 function texto(f: FormData, campo: string, max: number) {
   const v = f.get(campo);
@@ -51,11 +52,20 @@ export async function POST(req: Request) {
   const arquivos = f.getAll("fotos").filter((x): x is File => x instanceof File && x.size > 0);
   if (arquivos.length === 0) return erro("Envie pelo menos uma foto.");
   if (arquivos.length > EVENTO.maxFotos) return erro(`Envie no máximo ${EVENTO.maxFotos} fotos.`);
+  const minis = f.getAll("miniaturas").filter((x): x is File => x instanceof File && x.size > 0);
+  const usarMinis = minis.length === arquivos.length;
   const fotos: FotoUpload[] = [];
-  for (const a of arquivos) {
+  for (const [i, a] of arquivos.entries()) {
     if (!TIPOS.has(a.type)) return erro("As fotos precisam ser JPG, PNG ou WEBP.");
     if (a.size > MAX_BYTES) return erro("Cada foto pode ter no máximo 3 MB.");
-    fotos.push({ nome: a.name, tipo: a.type, dados: Buffer.from(await a.arrayBuffer()) });
+    const m = usarMinis ? minis[i] : null;
+    if (m && (m.type !== "image/jpeg" || m.size > MAX_MINI)) return erro("Miniatura de foto inválida.");
+    fotos.push({
+      nome: a.name,
+      tipo: a.type,
+      dados: Buffer.from(await a.arrayBuffer()),
+      miniatura: m ? Buffer.from(await m.arrayBuffer()) : undefined,
+    });
   }
 
   const store = await db();

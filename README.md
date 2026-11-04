@@ -26,7 +26,7 @@ Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (mod
 ## Publicar (Supabase + Vercel, plano gratuito)
 
 1. **Supabase**: crie um projeto em https://supabase.com, abra o *SQL Editor*, cole o conteúdo de `supabase/schema.sql` e clique em *Run*. Isso cria as tabelas e o bucket de fotos.
-2. Em *Project Settings → API*, copie a **Project URL** e a chave **service_role**.
+2. Copie a **Project URL** (*Project Settings → Data API*) e a **secret key** (*Project Settings → API Keys*; a antiga **service_role** também funciona).
 3. **GitHub**: suba este projeto para um repositório.
 4. **Vercel**: em https://vercel.com, importe o repositório e configure as variáveis de ambiente:
 
@@ -38,6 +38,8 @@ Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (mod
 | `APP_SECRET` | texto aleatório longo, com 32+ caracteres |
 
 5. (Opcional) Compre um domínio no Registro.br e conecte na Vercel.
+
+O arquivo `vercel.json` agenda uma chamada diária a `/api/saude`, que consulta o banco e impede o Supabase gratuito de pausar por inatividade.
 
 > ⚠️ **Não troque o `APP_SECRET` depois que a votação começar.** Ele é usado para criptografar os CPFs, e trocar o valor permitiria que um CPF votasse de novo.
 

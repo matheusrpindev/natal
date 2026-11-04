@@ -26,9 +26,9 @@ function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) =>
   return (
     <li className="cartao flex flex-col gap-4 p-4 md:flex-row">
       <div className="flex shrink-0 gap-2">
-        {i.fotos.map((f) => (
+        {i.fotos.map((f, k) => (
           <a key={f} href={urlFoto(f)} target="_blank" rel="noreferrer">
-            <img src={urlFoto(f)} alt="" className="h-24 w-24 rounded-lg object-cover" loading="lazy" />
+            <img src={urlFoto(i.miniaturas[k] ?? f)} alt="" className="h-24 w-24 rounded-lg object-cover" loading="lazy" />
           </a>
         ))}
       </div>

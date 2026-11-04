@@ -12,6 +12,8 @@ export interface CasaPublica {
   latitude: number | null;
   longitude: number | null;
   fotos: string[];
+  /** Versões pequenas das fotos (cai para a foto grande em inscrições antigas). */
+  miniaturas: string[];
 }
 
 export function paraPublico(i: Inscricao, urlFoto: (c: string) => string): CasaPublica {
@@ -25,6 +27,7 @@ export function paraPublico(i: Inscricao, urlFoto: (c: string) => string): CasaP
     latitude: i.latitude ?? null,
     longitude: i.longitude ?? null,
     fotos: i.fotos.map(urlFoto),
+    miniaturas: (i.miniaturas?.length ? i.miniaturas : i.fotos).map(urlFoto),
   };
 }
 
@@ -36,8 +39,8 @@ export function CartaoCasa({ casa, children }: { casa: CasaPublica; children?: R
   return (
     <article className="cartao flex flex-col overflow-hidden">
       <div className="relative aspect-[4/3] bg-verde-escuro">
-        {casa.fotos[0] ? (
-          <img src={casa.fotos[0]} alt={`Decoração de ${nomeCasa(casa)}`} className="h-full w-full object-cover" loading="lazy" />
+        {casa.miniaturas[0] ? (
+          <img src={casa.miniaturas[0]} alt={`Decoração de ${nomeCasa(casa)}`} className="h-full w-full object-cover" loading="lazy" />
         ) : (
           <div className="flex h-full items-center justify-center text-white/40">
             <House size={56} strokeWidth={1.5} aria-hidden />

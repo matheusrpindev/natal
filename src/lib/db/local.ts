@@ -49,15 +49,26 @@ function mutar<T>(fn: (d: Dados) => T | Promise<T>): Promise<T> {
   return p;
 }
 
+/** Inscrições gravadas antes de novos campos existirem. */
+function comPadroes(i: Inscricao): Inscricao {
+  return { ...i, miniaturas: i.miniaturas ?? [], cep: i.cep ?? null, latitude: i.latitude ?? null, longitude: i.longitude ?? null };
+}
+
 export const localStore: Store = {
   async criarInscricao(dados: NovaInscricao, fotos: FotoUpload[]) {
     const id = randomUUID();
     await mkdir(UPLOADS_DIR, { recursive: true });
     const caminhos: string[] = [];
+    const miniaturas: string[] = [];
     for (const [i, f] of fotos.entries()) {
       const nome = `${id}-${i + 1}.${extensao(f.tipo)}`;
       await writeFile(path.join(UPLOADS_DIR, nome), f.dados);
       caminhos.push(nome);
+      if (f.miniatura) {
+        const mini = `${id}-${i + 1}-mini.jpg`;
+        await writeFile(path.join(UPLOADS_DIR, mini), f.miniatura);
+        miniaturas.push(mini);
+      }
     }
     return mutar((d) => {
       const nova: Inscricao = {
@@ -68,6 +79,7 @@ export const localStore: Store = {
         status: "pendente",
         numero: null,
         fotos: caminhos,
+        miniaturas: miniaturas.length === caminhos.length ? miniaturas : [],
       };
       d.inscricoes.push(nova);
       return nova;
@@ -75,11 +87,12 @@ export const localStore: Store = {
   },
   async listarInscricoes(status?: StatusInscricao) {
     const d = await ler();
-    return d.inscricoes.filter((i) => !status || i.status === status);
+    return d.inscricoes.filter((i) => !status || i.status === status).map(comPadroes);
   },
   async buscarInscricao(id: string) {
     const d = await ler();
-    return d.inscricoes.find((i) => i.id === id) ?? null;
+    const i = d.inscricoes.find((x) => x.id === id);
+    return i ? comPadroes(i) : null;
   },
   async mudarStatus(id: string, status: StatusInscricao) {
     await mutar((d) => {

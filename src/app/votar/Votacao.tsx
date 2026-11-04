@@ -137,7 +137,7 @@ function JanelaVoto({ casa, fechar, concluido }: { casa: CasaPublica; fechar: ()
       <div className="bengala h-2" />
       <form onSubmit={votar} className="flex flex-col gap-4 p-6">
         <div className="flex items-center gap-4">
-          {casa.fotos[0] && <img src={casa.fotos[0]} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
+          {casa.miniaturas[0] && <img src={casa.miniaturas[0]} alt="" className="h-20 w-20 shrink-0 rounded-xl object-cover" />}
           <div>
             <p className="text-sm font-bold text-tinta-suave">Seu voto vai para</p>
             <p className="text-xl leading-tight font-extrabold">{nomeCasa(casa)}</p>

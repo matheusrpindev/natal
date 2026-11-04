@@ -23,14 +23,18 @@ export interface Inscricao {
   longitude: number | null;
   /** Caminhos das fotos no armazenamento. */
   fotos: string[];
+  /** Caminhos das miniaturas (mesma ordem de `fotos`; pode ser vazio em inscrições antigas). */
+  miniaturas: string[];
 }
 
-export type NovaInscricao = Omit<Inscricao, "id" | "protocolo" | "criadoEm" | "status" | "numero" | "fotos">;
+export type NovaInscricao = Omit<Inscricao, "id" | "protocolo" | "criadoEm" | "status" | "numero" | "fotos" | "miniaturas">;
 
 export interface FotoUpload {
   nome: string;
   tipo: string;
   dados: Buffer;
+  /** Versão pequena (480px) da mesma foto. */
+  miniatura?: Buffer;
 }
 
 export interface NovoVoto {

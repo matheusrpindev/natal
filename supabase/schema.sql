@@ -18,10 +18,12 @@ create table if not exists inscricoes (
   descricao text,
   latitude double precision,
   longitude double precision,
-  fotos text[] not null default '{}'
+  fotos text[] not null default '{}',
+  miniaturas text[] not null default '{}'
 );
 -- Para bancos criados antes do mapa:
 alter table inscricoes add column if not exists cep text;
+alter table inscricoes add column if not exists miniaturas text[] not null default '{}';
 alter table inscricoes add column if not exists latitude double precision;
 alter table inscricoes add column if not exists longitude double precision;
 

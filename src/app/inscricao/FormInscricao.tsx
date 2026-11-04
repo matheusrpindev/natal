@@ -10,10 +10,11 @@ import { mascararCep, soDigitosCep, verificarCep, type ResultadoParticipacao } f
 import { mascararTelefone } from "@/lib/cpf";
 import type { Rua } from "@/lib/ruas";
 import { EVENTO } from "@/lib/config";
-import { reduzirImagem } from "@/lib/reduzirImagem";
+import { prepararFoto } from "@/lib/reduzirImagem";
 
 interface Foto {
   blob: Blob;
+  miniatura: Blob;
   url: string;
 }
 
@@ -101,8 +102,8 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
     try {
       const novas: Foto[] = [];
       for (const arq of Array.from(lista).slice(0, EVENTO.maxFotos - fotos.length)) {
-        const blob = await reduzirImagem(arq);
-        novas.push({ blob, url: URL.createObjectURL(blob) });
+        const { grande, miniatura } = await prepararFoto(arq);
+        novas.push({ blob: grande, miniatura, url: URL.createObjectURL(miniatura) });
       }
       setFotos((f) => [...f, ...novas]);
     } catch (e) {
@@ -125,7 +126,10 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
       return;
     }
     const dados = new FormData(e.currentTarget);
-    fotos.forEach((f, i) => dados.append("fotos", f.blob, `foto-${i + 1}.jpg`));
+    fotos.forEach((f, i) => {
+      dados.append("fotos", f.blob, `foto-${i + 1}.jpg`);
+      dados.append("miniaturas", f.miniatura, `foto-${i + 1}-mini.jpg`);
+    });
     setEnviando(true);
     try {
       const r = await fetch("/api/inscricao", { method: "POST", body: dados });

@@ -35,7 +35,7 @@ async function Conteudo() {
             className={`cartao overflow-hidden ${c.posicao === 1 ? "ring-4 ring-dourado md:order-2 md:-mt-4" : c.posicao === 2 ? "md:order-1" : "md:order-3"}`}
           >
             <div className="relative aspect-[4/3] bg-verde-escuro">
-              {c.casa.fotos[0] && <img src={c.casa.fotos[0]} alt="" className="h-full w-full object-cover" />}
+              {c.casa.miniaturas[0] && <img src={c.casa.miniaturas[0]} alt="" className="h-full w-full object-cover" />}
               <span className="absolute top-2 left-3 drop-shadow-lg">
                 <Enfeite posicao={c.posicao as 1 | 2 | 3} tamanho={c.posicao === 1 ? 56 : 46} />
               </span>

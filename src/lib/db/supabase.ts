@@ -34,6 +34,7 @@ interface Linha {
   latitude: number | null;
   longitude: number | null;
   fotos: string[];
+  miniaturas: string[] | null;
 }
 
 function deLinha(l: Linha): Inscricao {
@@ -55,6 +56,7 @@ function deLinha(l: Linha): Inscricao {
     latitude: l.latitude ?? null,
     longitude: l.longitude ?? null,
     fotos: l.fotos ?? [],
+    miniaturas: l.miniaturas ?? [],
   };
 }
 
@@ -66,11 +68,20 @@ export const supabaseStore: Store = {
   async criarInscricao(dados: NovaInscricao, fotos: FotoUpload[]) {
     const id = crypto.randomUUID();
     const caminhos: string[] = [];
+    const miniaturas: string[] = [];
+    // As fotos nunca mudam depois de enviadas: cache longo economiza tráfego.
+    const opcoes = (tipo: string) => ({ contentType: tipo, cacheControl: "31536000", upsert: false });
     for (const [i, f] of fotos.entries()) {
       const caminho = `${id}/${i + 1}.${extensao(f.tipo)}`;
-      const { error } = await sb().storage.from(BUCKET).upload(caminho, f.dados, { contentType: f.tipo });
+      const { error } = await sb().storage.from(BUCKET).upload(caminho, f.dados, opcoes(f.tipo));
       falhou("upload", error);
       caminhos.push(caminho);
+      if (f.miniatura) {
+        const mini = `${id}/${i + 1}-mini.jpg`;
+        const r = await sb().storage.from(BUCKET).upload(mini, f.miniatura, opcoes("image/jpeg"));
+        falhou("upload da miniatura", r.error);
+        miniaturas.push(mini);
+      }
     }
     const { data, error } = await sb()
       .from("inscricoes")
@@ -89,6 +100,7 @@ export const supabaseStore: Store = {
         latitude: dados.latitude,
         longitude: dados.longitude,
         fotos: caminhos,
+        miniaturas: miniaturas.length === caminhos.length ? miniaturas : [],
       })
       .select()
       .single();

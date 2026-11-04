@@ -27,7 +27,7 @@ export function MapaCasas({ casas, votacao = false }: { casas: CasaPublica[]; vo
       });
       const destino = `https://www.google.com/maps/dir/?api=1&destination=${c.latitude},${c.longitude}`;
       const html = `<div class="popup-casa">
-        ${c.fotos[0] ? `<img src="${esc(c.fotos[0])}" alt="" />` : ""}
+        ${c.miniaturas[0] ? `<img src="${esc(c.miniaturas[0])}" alt="" />` : ""}
         <strong>#${num(c.numero)} · ${esc(nomeCasa(c))}</strong>
         <span>${esc(c.rua)}, ${esc(c.numeroCasa)}</span>
         <div class="popup-acoes">
