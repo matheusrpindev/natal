@@ -1,0 +1,9 @@
+Fonte dos títulos: P22 Yule Heavy Snow
+
+Coloque aqui o arquivo da fonte com UM destes nomes (o .woff2 é o melhor para sites):
+  p22-yule-heavy-snow.woff2
+  p22-yule-heavy-snow.woff
+  p22-yule-heavy-snow.otf
+
+Atenção à licença: para usar no site é preciso a licença de WEBFONT
+(a licença de desktop só vale para usar no computador).

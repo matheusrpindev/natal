@@ -6,7 +6,7 @@ import { EVENTO } from "@/lib/config";
 import "./globals.css";
 
 const nunito = Nunito({ variable: "--font-nunito", subsets: ["latin"] });
-const festiva = Mountains_of_Christmas({ variable: "--font-festiva", subsets: ["latin"], weight: ["400", "700"] });
+const festiva = Mountains_of_Christmas({ variable: "--font-reserva", subsets: ["latin"], weight: ["400", "700"] });
 
 export const metadata: Metadata = {
   title: { default: EVENTO.nome, template: `%s · ${EVENTO.nome}` },

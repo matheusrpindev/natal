@@ -44,6 +44,7 @@ Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (mod
 ## Personalizar
 
 - **Datas, nome e organizador**: `src/lib/config.ts`
+- **Fonte dos títulos (P22 Yule Heavy Snow)**: coloque o arquivo em `public/fonts/p22-yule-heavy-snow.woff2` (veja `public/fonts/LEIA-ME.txt`). Sem o arquivo, os títulos usam a Mountains of Christmas.
 - **Logo**: salve em `public/logo.png` e siga o comentário em `src/components/Logo.tsx`
 - **Prêmios**: seção "Prêmios" em `src/app/page.tsx`
 - **Regulamento**: `src/app/regulamento/page.tsx`

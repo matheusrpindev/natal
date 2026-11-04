@@ -1,5 +1,20 @@
 @import "tailwindcss";
 
+/*
+ * Fonte dos títulos: P22 Yule Heavy Snow (licença comercial da P22 Type Foundry).
+ * Coloque os arquivos em public/fonts/ com estes nomes. Enquanto não estiverem lá,
+ * os títulos usam a fonte reserva (Mountains of Christmas).
+ */
+@font-face {
+  font-family: "P22 Yule Heavy Snow";
+  src:
+    url("/fonts/p22-yule-heavy-snow.woff2") format("woff2"),
+    url("/fonts/p22-yule-heavy-snow.woff") format("woff"),
+    url("/fonts/p22-yule-heavy-snow.otf") format("opentype");
+  font-weight: 100 900; /* evita "negrito falso" por cima do desenho da fonte */
+  font-display: swap;
+}
+
 :root {
   --vermelho: #c8102e;
   --vermelho-escuro: #8e0b20;
@@ -30,7 +45,7 @@
   --color-tinta-suave: var(--tinta-suave);
   --color-borda: var(--borda);
   --font-sans: var(--font-nunito);
-  --font-festiva: var(--font-festiva);
+  --font-festiva: "P22 Yule Heavy Snow", var(--font-reserva), cursive;
 }
 
 body {
