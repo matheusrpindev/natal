@@ -42,3 +42,9 @@ next-env.d.ts
 
 # dados locais de teste
 /.data
+
+# arquivos de fonte com licença comercial (não versionar)
+/public/fonts/*.woff2
+/public/fonts/*.woff
+/public/fonts/*.otf
+/public/fonts/*.ttf
