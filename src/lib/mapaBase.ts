@@ -16,9 +16,18 @@ export interface MapaMontado {
 /**
  * Cria um mapa com satélite/ruas, a área do concurso contornada em vermelho
  * e tudo que está fora dela escurecido.
+ *
+ * `cancelado` evita criar o mapa se o componente já foi desmontado enquanto a
+ * biblioteca carregava (no modo de desenvolvimento o React monta tudo duas vezes,
+ * e criar dois mapas no mesmo elemento dá o erro "Map container is already initialized").
  */
-export async function montarMapa(el: HTMLElement, opcoes: { travarArea?: boolean } = {}): Promise<MapaMontado> {
+export async function montarMapa(
+  el: HTMLElement,
+  cancelado: () => boolean,
+  opcoes: { travarArea?: boolean } = {},
+): Promise<MapaMontado | null> {
   const L = (await import("leaflet")).default;
+  if (cancelado() || (el as HTMLElement & { _leaflet_id?: number })._leaflet_id) return null;
   const mapa = L.map(el, { scrollWheelZoom: false });
 
   const satelite = L.tileLayer(

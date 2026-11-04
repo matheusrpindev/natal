@@ -18,11 +18,9 @@ export function MapaCasas({ casas, votacao = false }: { casas: CasaPublica[]; vo
     let cancelado = false;
     (async () => {
       if (!caixa.current) return;
-      const { L, mapa: m } = await montarMapa(caixa.current);
-      if (cancelado) {
-        m.remove();
-        return;
-      }
+      const montado = await montarMapa(caixa.current, () => cancelado);
+      if (!montado) return;
+      const { L, mapa: m } = montado;
       mapa.current = m;
       for (const c of comLocal) {
         const icone = L.divIcon({

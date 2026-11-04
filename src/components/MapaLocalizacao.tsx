@@ -47,11 +47,9 @@ export function MapaLocalizacao({
     let cancelado = false;
     (async () => {
       if (!caixa.current) return;
-      const { L, mapa: m } = await montarMapa(caixa.current);
-      if (cancelado) {
-        m.remove();
-        return;
-      }
+      const montado = await montarMapa(caixa.current, () => cancelado);
+      if (!montado) return;
+      const { L, mapa: m } = montado;
       mapa.current = m;
       lib.current = L;
       const icone = L.divIcon({ html: PINO, className: "", iconSize: [34, 44], iconAnchor: [17, 43] });

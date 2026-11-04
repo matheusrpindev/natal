@@ -17,11 +17,9 @@ export function MapaArea({ destaque, mostrarRuas = true, altura = "h-80 sm:h-[28
     let cancelado = false;
     (async () => {
       if (!caixa.current) return;
-      const { L, mapa: m } = await montarMapa(caixa.current);
-      if (cancelado) {
-        m.remove();
-        return;
-      }
+      const montado = await montarMapa(caixa.current, () => cancelado);
+      if (!montado) return;
+      const { L, mapa: m } = montado;
       if (mostrarRuas) desenharRuas(L, m);
       mapa.current = m;
       lib.current = L;
