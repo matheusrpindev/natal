@@ -22,29 +22,6 @@ export function Selo({ icone: Icone, cor = "vermelho", tamanho = 48 }: { icone: 
   );
 }
 
-/** Estrela dourada do logo. */
-export function Estrela({ tamanho = 34 }: { tamanho?: number }) {
-  return (
-    <svg width={tamanho} height={tamanho} viewBox="0 0 48 48" aria-hidden className="drop-shadow-[0_0_10px_#f4c542aa]">
-      <defs>
-        <linearGradient id="estrela-ouro" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#ffe58a" />
-          <stop offset="0.55" stopColor="#f4c542" />
-          <stop offset="1" stopColor="#d99a0b" />
-        </linearGradient>
-      </defs>
-      <path
-        d="M24 3.5l5.9 13.1 14.3 1.5-10.7 9.6 3 14.1L24 34.6 11.5 41.8l3-14.1L3.8 18.1l14.3-1.5z"
-        fill="url(#estrela-ouro)"
-        stroke="#b8860b"
-        strokeWidth={1.5}
-        strokeLinejoin="round"
-      />
-      <path d="M24 9.5l3.6 8" stroke="#fff" strokeOpacity={0.7} strokeWidth={2} strokeLinecap="round" />
-    </svg>
-  );
-}
-
 const ENFEITES = {
   1: { claro: "#ffe58a", medio: "#f4c542", escuro: "#a8740a", texto: "#5a3b00" },
   2: { claro: "#ffffff", medio: "#cfd6de", escuro: "#7d8894", texto: "#33404d" },

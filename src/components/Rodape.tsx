@@ -1,6 +1,7 @@
 import { TreePine } from "lucide-react";
 import Link from "next/link";
 import { EVENTO } from "@/lib/config";
+import { Iniciativa } from "./Iniciativa";
 
 export function Rodape() {
   return (
@@ -10,8 +11,9 @@ export function Rodape() {
         <p className="font-festiva flex items-center gap-2 text-2xl text-dourado">
           <TreePine size={22} aria-hidden /> Feliz Natal, Scaffid II!
         </p>
+        <Iniciativa tamanho="h-14 sm:h-16" />
         <p>
-          {EVENTO.nome} {EVENTO.ano} · Uma iniciativa de <strong className="text-white">{EVENTO.organizador}</strong>
+          {EVENTO.nome} {EVENTO.ano}
         </p>
         <p className="flex gap-4">
           <Link href="/regulamento" className="underline-offset-4 hover:underline">

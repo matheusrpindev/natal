@@ -1,10 +1,10 @@
 import { ArrowRight, ClipboardPen, Lightbulb, Trophy, Vote } from "lucide-react";
-/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { Suspense } from "react";
 import { Contagem } from "@/components/Contagem";
 import { Enfeite, Selo } from "@/components/Icones";
 import { Neve } from "@/components/Neve";
+import { Iniciativa } from "@/components/Iniciativa";
 import { Organizador } from "@/components/Organizador";
 import { PodeParticipar } from "@/components/PodeParticipar";
 import { DATAS, EVENTO, formatarData } from "@/lib/config";
@@ -98,14 +98,7 @@ export default function Inicio() {
             Vamos encher o bairro de luz! Decore sua casa, inscreva-se e concorra ao título de{" "}
             <strong className="text-dourado">casa mais bonita do Natal</strong>.
           </p>
-          <div className="mt-6 inline-flex items-center gap-3 rounded-2xl bg-creme py-2 pr-4 pl-5 shadow-[0_8px_30px_-10px_#000] ring-1 ring-dourado/40">
-            <span className="text-[0.7rem] leading-tight font-extrabold tracking-[0.18em] text-verde uppercase">
-              Uma
-              <br />
-              iniciativa de
-            </span>
-            <img src="/marcos-logo.webp" alt={EVENTO.organizador} className="h-12 w-auto sm:h-14" />
-          </div>
+          <Iniciativa className="mt-6" />
           <div className="mt-10 min-h-48">
             <Suspense fallback={null}>
               <Destaque />
