@@ -1,26 +1,175 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --vermelho: #c8102e;
+  --vermelho-escuro: #8e0b20;
+  --verde: #0f5132;
+  --verde-escuro: #08301e;
+  --verde-noite: #061f15;
+  --dourado: #f4c542;
+  --dourado-escuro: #b8860b;
+  --creme: #fff8ec;
+  --papel: #fffdf8;
+  --tinta: #2a1a12;
+  --tinta-suave: #6b5446;
+  --borda: #ecdcc4;
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-vermelho: var(--vermelho);
+  --color-vermelho-escuro: var(--vermelho-escuro);
+  --color-verde: var(--verde);
+  --color-verde-escuro: var(--verde-escuro);
+  --color-verde-noite: var(--verde-noite);
+  --color-dourado: var(--dourado);
+  --color-dourado-escuro: var(--dourado-escuro);
+  --color-creme: var(--creme);
+  --color-papel: var(--papel);
+  --color-tinta: var(--tinta);
+  --color-tinta-suave: var(--tinta-suave);
+  --color-borda: var(--borda);
+  --font-sans: var(--font-nunito);
+  --font-festiva: var(--font-festiva);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--creme);
+  color: var(--tinta);
+  font-family: var(--font-nunito), system-ui, sans-serif;
+}
+
+/* Fundo "noite de Natal" com estrelinhas */
+.ceu-noturno {
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, #fff9 50%, transparent 51%),
+    radial-gradient(1px 1px at 28% 62%, #fff8 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 47% 30%, #fffa 50%, transparent 51%),
+    radial-gradient(1px 1px at 66% 12%, #fff9 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 81% 48%, #fff8 50%, transparent 51%),
+    radial-gradient(1px 1px at 92% 22%, #fffa 50%, transparent 51%),
+    radial-gradient(ellipse at 50% 120%, #1d6b45 0%, transparent 60%),
+    linear-gradient(180deg, var(--verde-noite) 0%, var(--verde-escuro) 100%);
+}
+
+/* Faixa listrada de bengala doce */
+.bengala {
+  background: repeating-linear-gradient(-45deg, var(--vermelho) 0 14px, #fff 14px 28px);
+}
+
+/* Luzinhas de Natal */
+.luzes {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  height: 34px;
+  overflow: hidden;
+  position: relative;
+}
+.luzes::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 14px;
+  border-bottom: 2px solid #1a1a1a;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+}
+.luz {
+  flex-shrink: 0;
+  position: relative;
+  top: 12px;
+  width: 11px;
+  height: 18px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: var(--cor);
+  box-shadow: 0 2px 14px 3px var(--cor);
+  animation: piscar 1.6s ease-in-out infinite;
+  animation-delay: var(--atraso);
+}
+.luz::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 2px;
+  width: 7px;
+  height: 6px;
+  border-radius: 2px;
+  background: #333;
+}
+@keyframes piscar {
+  0%, 100% { opacity: 1; box-shadow: 0 2px 16px 4px var(--cor); }
+  50% { opacity: 0.35; box-shadow: none; }
+}
+
+/* Neve caindo */
+.floco {
+  position: absolute;
+  top: -12px;
+  color: #fff;
+  user-select: none;
+  pointer-events: none;
+  animation: cair linear infinite;
+  text-shadow: 0 0 6px #fff8;
+}
+@keyframes cair {
+  0% { transform: translate3d(0, -10px, 0) rotate(0deg); }
+  100% { transform: translate3d(var(--deriva), 105vh, 0) rotate(360deg); }
+}
+
+.brilho-dourado {
+  background: linear-gradient(180deg, #ffe58a 0%, var(--dourado) 50%, #d99a0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@layer components {
+.cartao {
+  background: var(--papel);
+  border: 1px solid var(--borda);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 0 #fff inset, 0 10px 30px -18px #5a2a0a55;
+}
+
+.campo {
+  width: 100%;
+  border: 1.5px solid var(--borda);
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 1rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.campo:focus {
+  outline: none;
+  border-color: var(--verde);
+  box-shadow: 0 0 0 3px #0f513226;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 0.8rem 1.5rem;
+  transition: transform 0.12s, filter 0.12s, box-shadow 0.12s;
+  cursor: pointer;
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px); filter: brightness(1.06); }
+.btn:active:not(:disabled) { transform: translateY(0); }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-vermelho { background: var(--vermelho); color: #fff; box-shadow: 0 6px 18px -8px var(--vermelho); }
+.btn-dourado { background: var(--dourado); color: var(--verde-noite); box-shadow: 0 6px 18px -8px var(--dourado-escuro); }
+.btn-verde { background: var(--verde); color: #fff; }
+.btn-contorno { border: 2px solid currentColor; }
+
+}
+
+:focus-visible { outline: 3px solid var(--dourado); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .luz, .floco { animation: none; }
+  .neve { display: none; }
 }

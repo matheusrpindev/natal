@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎄 Natal Iluminado no Scaffid II
 
-## Getting Started
+Site do concurso de decoração de Natal do Scaffid II, uma iniciativa de **Marcos Teles**.
 
-First, run the development server:
+| Página | O que faz |
+|---|---|
+| `/` | Apresentação, contagem regressiva e chamada da fase atual |
+| `/inscricao` | Formulário de inscrição com até 3 fotos (abre de 09/11 a 30/11) |
+| `/casas` | Galeria das casas aprovadas |
+| `/votar` | Votação, 1 voto por CPF (abre de 01/12 a 14/12) |
+| `/resultado` | Pódio e ranking (aparece a partir de 18/12) |
+| `/regulamento` | Regulamento (rascunho, revisar) |
+| `/admin` | Painel da organização: aprovar inscrições, apuração ao vivo, exportar CSV, controle de fase |
+
+O site muda de fase sozinho pelas datas em `src/lib/config.ts`. No painel dá para forçar uma fase (para testes ou para prorrogar um prazo).
+
+## Rodar no computador
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra http://localhost:3000. Sem configurar nada, os dados ficam em `.data/` (modo de teste) e a senha do painel é `natal2026`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Publicar (Supabase + Vercel, plano gratuito)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Supabase**: crie um projeto em https://supabase.com, abra o *SQL Editor*, cole o conteúdo de `supabase/schema.sql` e clique em *Run*. Isso cria as tabelas e o bucket de fotos.
+2. Em *Project Settings → API*, copie a **Project URL** e a chave **service_role**.
+3. **GitHub**: suba este projeto para um repositório.
+4. **Vercel**: em https://vercel.com, importe o repositório e configure as variáveis de ambiente:
 
-## Learn More
+| Variável | Valor |
+|---|---|
+| `SUPABASE_URL` | Project URL do Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | chave service_role (nunca compartilhe) |
+| `ADMIN_PASSWORD` | senha do painel `/admin` |
+| `APP_SECRET` | texto aleatório longo, com 32+ caracteres |
 
-To learn more about Next.js, take a look at the following resources:
+5. (Opcional) Compre um domínio no Registro.br e conecte na Vercel.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> ⚠️ **Não troque o `APP_SECRET` depois que a votação começar.** Ele é usado para criptografar os CPFs, e trocar o valor permitiria que um CPF votasse de novo.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Personalizar
 
-## Deploy on Vercel
+- **Datas, nome e organizador**: `src/lib/config.ts`
+- **Logo**: salve em `public/logo.png` e siga o comentário em `src/components/Logo.tsx`
+- **Prêmios**: seção "Prêmios" em `src/app/page.tsx`
+- **Regulamento**: `src/app/regulamento/page.tsx`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Segurança e privacidade
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- O CPF **nunca é salvo**: o banco guarda só um hash (HMAC-SHA256), que garante 1 voto por CPF.
+- Os CPFs são validados pelos dígitos verificadores. Mesmo assim, existem geradores de CPF válido na internet. Para reduzir fraude, a organização pode olhar no painel votos repetidos do mesmo IP (o IP é guardado só como hash) e anular os suspeitos.
+- Telefone e e-mail dos inscritos aparecem só no painel da organização.
