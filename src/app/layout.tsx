@@ -10,8 +10,14 @@ import "./globals.css";
 const nunito = Nunito({ variable: "--font-nunito", subsets: ["latin"] });
 const festiva = Mountains_of_Christmas({ variable: "--font-reserva", subsets: ["latin"], weight: ["400", "700"] });
 
+const urlSite = process.env.VERCEL_PROJECT_PRODUCTION_URL
+  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(urlSite),
   title: { default: EVENTO.nome, template: `%s · ${EVENTO.nome}` },
+  openGraph: { type: "website", locale: "pt_BR", siteName: EVENTO.nome },
   description: `Concurso da casa com a decoração de Natal mais bonita do ${EVENTO.local}. Uma iniciativa de ${EVENTO.organizador}.`,
 };
 

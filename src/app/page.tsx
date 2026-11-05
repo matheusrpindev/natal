@@ -90,9 +90,14 @@ export default function Inicio() {
           <p className="rounded-full border border-dourado/40 bg-dourado/10 px-4 py-1.5 text-xs font-extrabold tracking-[0.12em] text-dourado uppercase sm:tracking-[0.2em]">
             Concurso de decoração de Natal {EVENTO.ano}
           </p>
-          <h1 className="font-festiva mt-5 text-5xl leading-[0.95] font-bold sm:text-7xl md:text-8xl">
-            <span className="brilho-dourado drop-shadow-[0_0_25px_#f4c54255]">Natal Iluminado</span>
-            <span className="mt-2 block text-3xl text-white sm:text-5xl">no Scaffid II</span>
+          <h1 className="mt-6">
+            <span className="sr-only">Natal Iluminado no Scaffid II</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/logo-natal.webp"
+              alt=""
+              className="mx-auto h-56 w-auto drop-shadow-[0_10px_30px_#000a] sm:h-72 md:h-80"
+            />
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/85 sm:text-xl">
             Vamos encher o bairro de luz! Decore sua casa, inscreva-se e concorra ao título de{" "}
