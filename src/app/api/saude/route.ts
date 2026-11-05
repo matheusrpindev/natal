@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import { db } from "@/lib/db";
+import { db, usandoSupabase } from "@/lib/db";
 
 /**
  * Verificação de saúde. A Vercel chama esta rota uma vez por dia (vercel.json → crons),
@@ -10,9 +10,9 @@ export async function GET() {
   try {
     const store = await db();
     await store.lerFase();
-    return Response.json({ ok: true, em: new Date().toISOString() });
+    return Response.json({ ok: true, banco: usandoSupabase ? "supabase" : "local (teste)", em: new Date().toISOString() });
   } catch (e) {
     console.error("[saude]", e);
-    return Response.json({ ok: false }, { status: 503 });
+    return Response.json({ ok: false, banco: usandoSupabase ? "supabase" : "local (teste)" }, { status: 503 });
   }
 }
