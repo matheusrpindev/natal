@@ -154,7 +154,7 @@ export default function Inicio() {
               Uma única casa vencedora: <strong className="text-white">só o 1º lugar é premiado</strong>.{" "}
               {EVENTO.premio
                 ? `O prêmio: ${EVENTO.premio}.`
-                : "O prêmio será divulgado aqui no site antes do início da votação."}
+                : "O prêmio será anunciado em breve aqui no site."}
             </p>
           </div>
           <div className="flex justify-center" aria-hidden>

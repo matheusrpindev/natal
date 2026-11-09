@@ -10,7 +10,7 @@ export const EVENTO = {
   /** Nome completo do organizador (regulamento e política de privacidade). */
   organizadorCompleto: "Marcos Diego Teles Monteiro",
   instagram: "omarcosteles",
-  /** Descrição do prêmio do 1º lugar. Enquanto for null, o site diz que será divulgado antes da votação. */
+  /** Descrição do prêmio do 1º lugar. Enquanto for null, o site diz que será anunciado em breve. */
   premio: null as string | null,
   ano: 2026,
   /** Quantas fotos cada casa pode enviar. */

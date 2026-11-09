@@ -17,7 +17,7 @@ export interface SecaoRegulamento {
 }
 
 const IG = `@${EVENTO.instagram}`;
-const PREMIO = EVENTO.premio ?? "será divulgado neste site antes do início da votação";
+const PREMIO = EVENTO.premio ?? "a ser divulgado neste site";
 
 export const CRITERIOS_DESEMPATE: [string, string][] = [
   ["Iluminação e composição visual", "40%"],
