@@ -7,28 +7,36 @@ export interface CasaPublica {
   numero: number | null;
   titulo: string | null;
   rua: string;
-  numeroCasa: string;
+  /** Só quando o responsável autorizou (regulamento 11.4). */
+  numeroCasa: string | null;
   descricao: string | null;
   latitude: number | null;
   longitude: number | null;
   fotos: string[];
+  /** Ponto no mapa: só quando o responsável autorizou (regulamento 11.4). */
   /** Versões pequenas das fotos (cai para a foto grande em inscrições antigas). */
   miniaturas: string[];
 }
 
 export function paraPublico(i: Inscricao, urlFoto: (c: string) => string): CasaPublica {
+  const autorizou = i.autorizaLocalizacao === true;
   return {
     id: i.id,
     numero: i.numero,
     titulo: i.titulo,
     rua: i.rua,
-    numeroCasa: i.numeroCasa,
+    numeroCasa: autorizou ? i.numeroCasa : null,
     descricao: i.descricao,
-    latitude: i.latitude ?? null,
-    longitude: i.longitude ?? null,
+    latitude: autorizou ? (i.latitude ?? null) : null,
+    longitude: autorizou ? (i.longitude ?? null) : null,
     fotos: i.fotos.map(urlFoto),
     miniaturas: (i.miniaturas?.length ? i.miniaturas : i.fotos).map(urlFoto),
   };
+}
+
+/** Rua, com o número só se o responsável autorizou. */
+export function enderecoPublico(c: Pick<CasaPublica, "rua" | "numeroCasa">) {
+  return c.numeroCasa ? `${c.rua}, ${c.numeroCasa}` : c.rua;
 }
 
 export function nomeCasa(c: Pick<CasaPublica, "numero" | "titulo">) {
@@ -58,7 +66,7 @@ export function CartaoCasa({ casa, children }: { casa: CasaPublica; children?: R
       <div className="flex flex-1 flex-col gap-1 p-4">
         <h3 className="text-lg leading-tight font-extrabold">{nomeCasa(casa)}</h3>
         <p className="flex items-center gap-1 text-sm text-tinta-suave">
-          <MapPin size={14} className="shrink-0 text-vermelho" aria-hidden /> {casa.rua}, {casa.numeroCasa}
+          <MapPin size={14} className="shrink-0 text-vermelho" aria-hidden /> {enderecoPublico(casa)}
         </p>
         {casa.descricao && <p className="mt-1 line-clamp-3 text-sm">{casa.descricao}</p>}
         {children && <div className="mt-auto pt-3">{children}</div>}

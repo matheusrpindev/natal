@@ -82,6 +82,7 @@ export async function POST(req: Request) {
       descricao: texto(f, "descricao", 500) || null,
       latitude,
       longitude,
+      autorizaLocalizacao: f.get("autorizaLocalizacao") === "sim",
     },
     fotos,
   );

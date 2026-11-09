@@ -4,7 +4,7 @@ import type { Map as MapaLeaflet } from "leaflet";
 import { useRef } from "react";
 import { useMapa } from "@/lib/mapaBase";
 import { AvisoMapa } from "./AvisoMapa";
-import { nomeCasa, type CasaPublica } from "./CartaoCasa";
+import { enderecoPublico, nomeCasa, type CasaPublica } from "./CartaoCasa";
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 const num = (n: number | null) => String(n ?? 0).padStart(2, "0");
@@ -29,7 +29,7 @@ export function MapaCasas({ casas, votacao = false }: { casas: CasaPublica[]; vo
       const html = `<div class="popup-casa">
         ${c.miniaturas[0] ? `<img src="${esc(c.miniaturas[0])}" alt="" />` : ""}
         <strong>#${num(c.numero)} · ${esc(nomeCasa(c))}</strong>
-        <span>${esc(c.rua)}, ${esc(c.numeroCasa)}</span>
+        <span>${esc(enderecoPublico(c))}</span>
         <div class="popup-acoes">
           <a href="/casas/${c.id}">Ver fotos</a>
           ${votacao ? `<a class="votar" href="/votar?casa=${c.id}">Votar</a>` : ""}

@@ -3,7 +3,17 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, writeFile, rename } from "node:fs/promises";
 import path from "node:path";
 import type { Fase } from "../phase";
-import type { Inscricao, NovaInscricao, FotoUpload, NovoVoto, Store, StatusInscricao } from "./types";
+import type {
+  Contestacao,
+  FotoUpload,
+  Inscricao,
+  NovaContestacao,
+  NovaInscricao,
+  NovoVoto,
+  StatusContestacao,
+  StatusInscricao,
+  Store,
+} from "./types";
 import { extensao, gerarProtocolo } from "./util";
 
 /**
@@ -17,6 +27,7 @@ const ARQ = path.join(DIR, "db.json");
 interface Dados {
   inscricoes: Inscricao[];
   votos: (NovoVoto & { criadoEm: string })[];
+  contestacoes?: Contestacao[];
   fase?: Fase | null;
 }
 
@@ -51,7 +62,14 @@ function mutar<T>(fn: (d: Dados) => T | Promise<T>): Promise<T> {
 
 /** Inscrições gravadas antes de novos campos existirem. */
 function comPadroes(i: Inscricao): Inscricao {
-  return { ...i, miniaturas: i.miniaturas ?? [], cep: i.cep ?? null, latitude: i.latitude ?? null, longitude: i.longitude ?? null };
+  return {
+    ...i,
+    miniaturas: i.miniaturas ?? [],
+    cep: i.cep ?? null,
+    latitude: i.latitude ?? null,
+    longitude: i.longitude ?? null,
+    autorizaLocalizacao: i.autorizaLocalizacao ?? false,
+  };
 }
 
 export const localStore: Store = {
@@ -119,6 +137,28 @@ export const localStore: Store = {
   },
   async totalVotos() {
     return (await ler()).votos.length;
+  },
+  async criarContestacao(dados: NovaContestacao) {
+    return mutar((d) => {
+      const nova: Contestacao = {
+        ...dados,
+        id: randomUUID(),
+        protocolo: gerarProtocolo("CT"),
+        criadoEm: new Date().toISOString(),
+        status: "recebida",
+      };
+      (d.contestacoes ??= []).push(nova);
+      return nova;
+    });
+  },
+  async listarContestacoes() {
+    return (await ler()).contestacoes ?? [];
+  },
+  async mudarStatusContestacao(id: string, status: StatusContestacao) {
+    await mutar((d) => {
+      const c = d.contestacoes?.find((x) => x.id === id);
+      if (c) c.status = status;
+    });
   },
   async lerFase() {
     return (await ler()).fase ?? null;

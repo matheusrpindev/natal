@@ -27,10 +27,12 @@ async function Conteudo({ searchParams }: { searchParams: Promise<{ casa?: strin
   if (fase !== "votacao") {
     return (
       <Aviso icone={Lock} titulo="Votação encerrada">
-        Obrigado a todos que votaram! O resultado sai no dia <strong>{formatarData(DATAS.resultado)}</strong>.{" "}
-        {fase === "resultado" && (
+        Obrigado a todos que votaram! A classificação preliminar sai no dia{" "}
+        <strong>{formatarData(DATAS.preliminar)}</strong> e o resultado definitivo no dia{" "}
+        <strong>{formatarData(DATAS.resultado)}</strong>.{" "}
+        {(fase === "preliminar" || fase === "resultado") && (
           <Link href="/resultado" className="font-bold text-verde underline">
-            Ver o resultado
+            {fase === "resultado" ? "Ver o resultado" : "Ver a classificação preliminar"}
           </Link>
         )}
       </Aviso>

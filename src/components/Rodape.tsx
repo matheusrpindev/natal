@@ -1,4 +1,4 @@
-import { TreePine } from "lucide-react";
+import { AtSign, TreePine } from "lucide-react";
 import Link from "next/link";
 import { EVENTO } from "@/lib/config";
 import { Iniciativa } from "./Iniciativa";
@@ -15,9 +15,20 @@ export function Rodape() {
         <p>
           {EVENTO.nome} {EVENTO.ano}
         </p>
-        <p className="flex gap-4">
+        <a
+          href={`https://www.instagram.com/${EVENTO.instagram}/`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1 font-bold text-white underline-offset-4 hover:underline"
+        >
+          <AtSign size={16} aria-hidden /> {EVENTO.instagram}
+        </a>
+        <p className="flex flex-wrap justify-center gap-x-4 gap-y-1">
           <Link href="/regulamento" className="underline-offset-4 hover:underline">
             Regulamento
+          </Link>
+          <Link href="/privacidade" className="underline-offset-4 hover:underline">
+            Privacidade
           </Link>
           <Link href="/admin" className="underline-offset-4 hover:underline">
             Organização

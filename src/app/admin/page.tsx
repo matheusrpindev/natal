@@ -1,15 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
-import { Ban, CalendarDays, CircleCheck, Hourglass, MapPin, TriangleAlert, Trophy, User } from "lucide-react";
+import { Ban, CalendarDays, CircleCheck, Hourglass, MapPin, Scale, TriangleAlert, Trophy, User } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { nomeCasa } from "@/components/CartaoCasa";
 import { Selo } from "@/components/Icones";
 import { estaLogado } from "@/lib/admin";
 import { formatarDataHora } from "@/lib/config";
-import { db, faseAtual, usandoSupabase, type Inscricao, type StatusInscricao } from "@/lib/db";
+import { db, faseAtual, usandoSupabase, type Contestacao, type Inscricao, type StatusInscricao } from "@/lib/db";
 import { NOME_FASE } from "@/lib/phase";
 import { ranking } from "@/lib/ranking";
-import { sair } from "./actions";
+import { marcarContestacao, sair } from "./actions";
 import { BotoesStatus } from "./BotoesStatus";
 import { Login } from "./Login";
 import { SeletorFase } from "./SeletorFase";
@@ -41,6 +41,11 @@ function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) =>
           <MapPin size={14} className="shrink-0 text-vermelho" aria-hidden /> {i.rua}, {i.numeroCasa}
           {i.cep && ` · CEP ${i.cep}`}
           {i.complemento && ` · ${i.complemento}`}
+          {!i.autorizaLocalizacao && (
+            <span className="ml-1 rounded bg-dourado/25 px-1.5 text-xs font-bold text-dourado-escuro">
+              número e mapa não autorizados
+            </span>
+          )}
           {i.latitude != null && i.longitude != null && (
             <a
               href={`https://www.google.com/maps?q=${i.latitude},${i.longitude}`}
@@ -71,13 +76,63 @@ function CartaoInscricao({ i, urlFoto }: { i: Inscricao; urlFoto: (c: string) =>
   );
 }
 
+function Contestacoes({ lista }: { lista: Contestacao[] }) {
+  return (
+    <section className="cartao p-6">
+      <h2 className="flex items-center gap-3 text-xl font-extrabold">
+        <Selo icone={Scale} cor="dourado" tamanho={40} /> Contestações{" "}
+        <span className="text-tinta-suave">({lista.filter((c) => c.status === "recebida").length} a responder)</span>
+      </h2>
+      <p className="mt-1 text-sm text-tinta-suave">
+        Recebidas pelo formulário do site na fase de classificação preliminar. Analise, responda ao participante pelo
+        WhatsApp e marque como respondida (regulamento 9.5).
+      </p>
+      {lista.length === 0 ? (
+        <p className="mt-4 text-tinta-suave">Nenhuma contestação.</p>
+      ) : (
+        <ul className="mt-4 flex flex-col gap-3">
+          {lista.map((c) => (
+            <li key={c.id} className={`rounded-xl border p-4 ${c.status === "recebida" ? "border-dourado bg-dourado/10" : "border-borda"}`}>
+              <p className="font-extrabold">
+                {c.protocolo} · inscrição {c.protocoloInscricao}{" "}
+                <span className="text-sm font-bold text-tinta-suave">· {formatarDataHora(new Date(c.criadoEm))}</span>
+              </p>
+              <p className="text-sm">
+                {c.nome} ·{" "}
+                <a href={`https://wa.me/55${c.whatsapp}`} target="_blank" rel="noreferrer" className="font-bold text-verde underline">
+                  WhatsApp {c.whatsapp}
+                </a>
+                {c.email && ` · ${c.email}`}
+              </p>
+              <p className="mt-2 whitespace-pre-line">{c.descricao}</p>
+              {c.evidencias && <p className="mt-2 text-sm whitespace-pre-line text-tinta-suave">Evidências: {c.evidencias}</p>}
+              <form
+                action={marcarContestacao.bind(null, c.id, c.status === "recebida" ? "respondida" : "recebida")}
+                className="mt-3"
+              >
+                <button className="btn btn-contorno px-4 py-2 text-sm text-verde">
+                  {c.status === "recebida" ? "Marcar como respondida" : "Reabrir"}
+                </button>
+              </form>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
 async function Painel() {
   if (!(await estaLogado())) return <Login />;
   const store = await db();
-  const [inscricoes, { fase }, { lista, total }] = await Promise.all([
+  const [inscricoes, { fase }, { lista, total }, contestacoes] = await Promise.all([
     store.listarInscricoes(),
     faseAtual(),
     ranking(),
+    store.listarContestacoes().catch((e) => {
+      console.error("[admin] contestações", e);
+      return [] as Contestacao[];
+    }),
   ]);
   const urlFoto = (c: string) => store.urlFoto(c);
   const conta = (s: StatusInscricao) => inscricoes.filter((i) => i.status === s).length;
@@ -155,6 +210,8 @@ async function Painel() {
           </ol>
         )}
       </section>
+
+      {(contestacoes.length > 0 || fase === "preliminar" || fase === "resultado") && <Contestacoes lista={contestacoes} />}
 
       {GRUPOS.map((g) => {
         const itens = inscricoes.filter((i) => i.status === g.status);

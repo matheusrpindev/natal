@@ -4,7 +4,7 @@
 import { CircleCheck, ShieldCheck, Vote } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { CartaoCasa, nomeCasa, type CasaPublica } from "@/components/CartaoCasa";
+import { CartaoCasa, enderecoPublico, nomeCasa, type CasaPublica } from "@/components/CartaoCasa";
 import { Selo } from "@/components/Icones";
 import { MapaCasas } from "@/components/MapaCasas";
 import { cpfValido, mascararCpf } from "@/lib/cpf";
@@ -38,7 +38,7 @@ export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: str
   const termo = busca.trim().toLowerCase();
   const filtradas = termo
     ? casas.filter((c) =>
-        [nomeCasa(c), c.rua, c.numeroCasa, String(c.numero)].some((v) => v.toLowerCase().includes(termo)),
+        [nomeCasa(c), c.rua, c.numeroCasa ?? "", String(c.numero)].some((v) => v.toLowerCase().includes(termo)),
       )
     : casas;
 
@@ -142,7 +142,7 @@ function JanelaVoto({ casa, fechar, concluido }: { casa: CasaPublica; fechar: ()
             <p className="text-sm font-bold text-tinta-suave">Seu voto vai para</p>
             <p className="text-xl leading-tight font-extrabold">{nomeCasa(casa)}</p>
             <p className="text-sm text-tinta-suave">
-              #{String(casa.numero ?? 0).padStart(2, "0")} · {casa.rua}, {casa.numeroCasa}
+              #{String(casa.numero ?? 0).padStart(2, "0")} · {enderecoPublico(casa)}
             </p>
           </div>
         </div>
@@ -169,7 +169,14 @@ function JanelaVoto({ casa, fechar, concluido }: { casa: CasaPublica; fechar: ()
         <input type="text" name="site" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
         <label className="flex items-start gap-3 text-sm">
           <input type="checkbox" name="aceite" required className="mt-0.5 h-5 w-5 accent-verde" />
-          <span>Declaro que o CPF informado é meu. Sei que cada CPF vota uma única vez e o voto não pode ser alterado.</span>
+          <span>
+            Declaro que o CPF informado é meu. Sei que cada CPF vota uma única vez e o voto não pode ser alterado. O CPF é
+            guardado só em formato criptografado (
+            <a href="/privacidade" target="_blank" className="font-bold text-verde underline">
+              privacidade
+            </a>
+            ).
+          </span>
         </label>
         {erro && (
           <p role="alert" className="rounded-xl bg-vermelho/10 p-3 font-bold text-vermelho">

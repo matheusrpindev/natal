@@ -31,4 +31,4 @@ export async function faseAtual(): Promise<{ fase: Fase }> {
   return { fase: isFase(fase) ? fase : FASE_INICIAL };
 }
 
-export type { Inscricao, StatusInscricao } from "./types";
+export type { Contestacao, Inscricao, StatusContestacao, StatusInscricao } from "./types";

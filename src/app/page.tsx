@@ -31,7 +31,7 @@ const ETAPAS = [
     cor: "dourado" as const,
     titulo: "Resultado",
     quando: formatarData(DATAS.resultado),
-    texto: "Divulgação das casas mais iluminadas do Scaffid II e entrega dos prêmios.",
+    texto: `Classificação preliminar em ${formatarData(DATAS.preliminar)} e resultado definitivo em ${formatarData(DATAS.resultado)}. Só o 1º lugar é premiado.`,
   },
 ];
 
@@ -40,6 +40,11 @@ const CHAMADA: Record<Fase, { texto: string; href: string; rotulo: string } | nu
   inscricoes: { texto: "Inscrições abertas! Mostre a decoração da sua casa.", href: "/inscricao", rotulo: "Inscrever minha casa" },
   votacao: { texto: "A votação está aberta! Escolha a casa mais bonita.", href: "/votar", rotulo: "Votar agora" },
   apuracao: { texto: "Votação encerrada! Estamos apurando os votos.", href: "/casas", rotulo: "Ver as casas" },
+  preliminar: {
+    texto: "Saiu a classificação preliminar! O resultado definitivo sai depois do prazo de contestação.",
+    href: "/resultado",
+    rotulo: "Ver a classificação",
+  },
   resultado: { texto: "Saiu o resultado do Natal Iluminado!", href: "/resultado", rotulo: "Ver o resultado" },
 };
 
@@ -91,7 +96,7 @@ export default function Inicio() {
             Concurso de decoração de Natal {EVENTO.ano}
           </p>
           <h1 className="mt-6">
-            <span className="sr-only">Natal Iluminado no Scaffid II</span>
+            <span className="sr-only">Natal Iluminado do Scaffid II</span>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/logo-natal.webp"
@@ -144,17 +149,16 @@ export default function Inicio() {
       <section className="bg-verde text-white">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-[1fr_auto]">
           <div>
-            <h2 className="font-festiva text-4xl font-bold text-dourado sm:text-5xl">Prêmios</h2>
+            <h2 className="font-festiva text-4xl font-bold text-dourado sm:text-5xl">Prêmio</h2>
             <p className="mt-3 max-w-2xl text-lg text-white/90">
-              Os prêmios serão anunciados em breve. Fique de olho aqui no site e nos grupos do bairro!
+              Uma única casa vencedora: <strong className="text-white">só o 1º lugar é premiado</strong>.{" "}
+              {EVENTO.premio
+                ? `O prêmio: ${EVENTO.premio}.`
+                : "O prêmio será divulgado aqui no site antes do início da votação."}
             </p>
           </div>
-          <div className="flex items-start justify-center gap-5" aria-hidden>
-            <Enfeite posicao={2} tamanho={72} />
-            <span className="-mt-2">
-              <Enfeite posicao={1} tamanho={92} />
-            </span>
-            <Enfeite posicao={3} tamanho={72} />
+          <div className="flex justify-center" aria-hidden>
+            <Enfeite posicao={1} tamanho={104} />
           </div>
         </div>
       </section>

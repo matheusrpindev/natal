@@ -1,4 +1,4 @@
--- Natal Iluminado no Scaffid II — estrutura do banco (Supabase / Postgres)
+-- Natal Iluminado do Scaffid II — estrutura do banco (Supabase / Postgres)
 -- Cole este arquivo inteiro no SQL Editor do Supabase e clique em "Run".
 
 create table if not exists inscricoes (
@@ -19,13 +19,17 @@ create table if not exists inscricoes (
   latitude double precision,
   longitude double precision,
   fotos text[] not null default '{}',
-  miniaturas text[] not null default '{}'
+  miniaturas text[] not null default '{}',
+  -- Autorização específica para mostrar o número da casa e o ponto no mapa público (regulamento 11.4)
+  autoriza_localizacao boolean not null default false
 );
 -- Para bancos criados antes do mapa:
 alter table inscricoes add column if not exists cep text;
 alter table inscricoes add column if not exists miniaturas text[] not null default '{}';
 alter table inscricoes add column if not exists latitude double precision;
 alter table inscricoes add column if not exists longitude double precision;
+-- Para bancos criados antes do regulamento oficial:
+alter table inscricoes add column if not exists autoriza_localizacao boolean not null default false;
 
 create table if not exists votos (
   id bigint generated always as identity primary key,
@@ -38,6 +42,20 @@ create table if not exists votos (
   user_agent text
 );
 create index if not exists votos_inscricao_idx on votos (inscricao_id);
+
+-- Contestações da classificação preliminar (regulamento 9.3 e 9.4)
+create table if not exists contestacoes (
+  id uuid primary key default gen_random_uuid(),
+  created_at timestamptz not null default now(),
+  protocolo text not null unique,
+  status text not null default 'recebida' check (status in ('recebida', 'respondida')),
+  protocolo_inscricao text not null,
+  nome text not null,
+  whatsapp text not null,
+  email text,
+  descricao text not null,
+  evidencias text
+);
 
 create table if not exists configuracoes (
   chave text primary key,
@@ -66,7 +84,8 @@ end $$;
 alter table inscricoes enable row level security;
 alter table votos enable row level security;
 alter table configuracoes enable row level security;
-revoke all on inscricoes, votos, configuracoes, contagem_votos from anon, authenticated;
+alter table contestacoes enable row level security;
+revoke all on inscricoes, votos, configuracoes, contestacoes, contagem_votos from anon, authenticated;
 revoke execute on function mudar_status_inscricao(uuid, text) from public, anon, authenticated;
 
 -- Bucket público para as fotos das casas

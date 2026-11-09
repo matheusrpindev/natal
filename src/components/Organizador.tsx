@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { User } from "lucide-react";
+import { AtSign, User } from "lucide-react";
 import { EVENTO } from "@/lib/config";
 
 /** Foto do organizador: salve em public/marcos.jpg (fundo branco fica ótimo). */
@@ -29,8 +29,16 @@ export function Organizador() {
           </h2>
           <p className="mt-4 text-lg text-tinta-suave">
             O Natal Iluminado nasceu para valorizar quem capricha na decoração e para unir os vizinhos do Scaffid II na
-            época mais bonita do ano. Participe, passeie pelo bairro e ajude a escolher as casas mais iluminadas!
+            época mais bonita do ano. Participe, passeie pelo bairro e ajude a escolher a casa mais iluminada!
           </p>
+          <a
+            href={`https://www.instagram.com/${EVENTO.instagram}/`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-1.5 font-bold text-verde underline-offset-4 hover:underline"
+          >
+            <AtSign size={18} aria-hidden /> {EVENTO.instagram} no Instagram
+          </a>
         </div>
       </div>
     </section>

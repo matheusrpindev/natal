@@ -5,7 +5,7 @@ import Link from "next/link";
 export function Logo() {
   return (
     <div className="flex items-center gap-3 leading-none">
-      <Link href="/" className="group" aria-label="Natal Iluminado no Scaffid II — início">
+      <Link href="/" className="group" aria-label="Natal Iluminado do Scaffid II — início">
         <img
           src="/logo-natal-p.webp"
           alt="Natal Iluminado Scaffid 2"

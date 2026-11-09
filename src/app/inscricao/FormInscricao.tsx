@@ -154,7 +154,8 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
         </p>
         <p className="mt-3 text-tinta-suave">
           A organização vai conferir as informações. Depois de aprovada, sua casa aparece na página de participantes e
-          entra na votação. Qualquer dúvida, entraremos em contato pelo WhatsApp informado.
+          entra na votação. Qualquer dúvida, entraremos em contato pelo WhatsApp informado. Guarde este protocolo: ele
+          identifica a sua inscrição, por exemplo, se precisar apresentar uma contestação.
         </p>
         <Link href="/" className="btn btn-verde mt-6">
           Voltar ao início
@@ -319,15 +320,29 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
       {/* Campo-armadilha contra robôs: fica invisível para pessoas */}
       <input type="text" name="site" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
 
+      <label className="flex items-start gap-3 rounded-xl border border-borda p-4">
+        <input type="checkbox" name="autorizaLocalizacao" value="sim" className="mt-1 h-5 w-5 accent-verde" />
+        <span className="text-sm">
+          <strong>Opcional:</strong> autorizo mostrar o número da casa e o ponto marcado no mapa público das casas
+          participantes, para quem quiser visitar. Sem essa autorização, a casa aparece só com o nome da rua e fica fora do
+          mapa público.
+        </span>
+      </label>
+
       <label className="flex items-start gap-3 rounded-xl bg-creme p-4">
         <input type="checkbox" name="aceite" required className="mt-1 h-5 w-5 accent-verde" />
         <span className="text-sm">
           Li e aceito o{" "}
           <Link href="/regulamento" target="_blank" className="font-bold text-verde underline">
             regulamento
-          </Link>{" "}
-          e autorizo a divulgação das fotos, do nome da rua e do número da casa no site e nas redes do concurso. Meu
-          telefone e e-mail não serão divulgados.
+          </Link>
+          . Declaro que tenho 18 anos ou mais, que moro nesta casa ou tenho autorização do responsável, e que as fotos
+          são reais, desta casa, sem montagem nem inteligência artificial. Autorizo a divulgação das fotos e do nome da
+          rua no site e nas redes do concurso. Meu telefone e e-mail não serão divulgados (
+          <Link href="/privacidade" target="_blank" className="font-bold text-verde underline">
+            política de privacidade
+          </Link>
+          ).
         </span>
       </label>
 

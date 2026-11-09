@@ -36,6 +36,13 @@ export async function mudarStatus(id: string, status: "aprovada" | "recusada" | 
   revalidatePath("/", "layout");
 }
 
+export async function marcarContestacao(id: string, status: "recebida" | "respondida") {
+  await exigirAdmin();
+  const store = await db();
+  await store.mudarStatusContestacao(id, status);
+  revalidatePath("/admin");
+}
+
 export async function definirFase(fase: string) {
   await exigirAdmin();
   if (!isFase(fase)) throw new Error("Fase inválida.");

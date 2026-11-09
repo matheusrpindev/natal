@@ -1,7 +1,17 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isFase, type Fase } from "../phase";
-import type { Inscricao, NovaInscricao, FotoUpload, NovoVoto, Store, StatusInscricao } from "./types";
+import type {
+  Contestacao,
+  FotoUpload,
+  Inscricao,
+  NovaContestacao,
+  NovaInscricao,
+  NovoVoto,
+  StatusContestacao,
+  StatusInscricao,
+  Store,
+} from "./types";
 import { extensao, gerarProtocolo } from "./util";
 
 const BUCKET = "fotos";
@@ -33,6 +43,7 @@ interface Linha {
   descricao: string | null;
   latitude: number | null;
   longitude: number | null;
+  autoriza_localizacao?: boolean | null;
   fotos: string[];
   miniaturas: string[] | null;
 }
@@ -55,8 +66,37 @@ function deLinha(l: Linha): Inscricao {
     descricao: l.descricao,
     latitude: l.latitude ?? null,
     longitude: l.longitude ?? null,
+    autorizaLocalizacao: l.autoriza_localizacao ?? false,
     fotos: l.fotos ?? [],
     miniaturas: l.miniaturas ?? [],
+  };
+}
+
+interface LinhaContestacao {
+  id: string;
+  protocolo: string;
+  created_at: string;
+  status: StatusContestacao;
+  protocolo_inscricao: string;
+  nome: string;
+  whatsapp: string;
+  email: string | null;
+  descricao: string;
+  evidencias: string | null;
+}
+
+function deLinhaContestacao(l: LinhaContestacao): Contestacao {
+  return {
+    id: l.id,
+    protocolo: l.protocolo,
+    criadoEm: l.created_at,
+    status: l.status,
+    protocoloInscricao: l.protocolo_inscricao,
+    nome: l.nome,
+    whatsapp: l.whatsapp,
+    email: l.email,
+    descricao: l.descricao,
+    evidencias: l.evidencias,
   };
 }
 
@@ -83,27 +123,32 @@ export const supabaseStore: Store = {
         miniaturas.push(mini);
       }
     }
-    const { data, error } = await sb()
-      .from("inscricoes")
-      .insert({
-        id,
-        protocolo: gerarProtocolo(),
-        responsavel: dados.responsavel,
-        whatsapp: dados.whatsapp,
-        email: dados.email,
-        cep: dados.cep,
-        rua: dados.rua,
-        numero_casa: dados.numeroCasa,
-        complemento: dados.complemento,
-        titulo: dados.titulo,
-        descricao: dados.descricao,
-        latitude: dados.latitude,
-        longitude: dados.longitude,
-        fotos: caminhos,
-        miniaturas: miniaturas.length === caminhos.length ? miniaturas : [],
-      })
-      .select()
-      .single();
+    const linha = {
+      id,
+      protocolo: gerarProtocolo(),
+      responsavel: dados.responsavel,
+      whatsapp: dados.whatsapp,
+      email: dados.email,
+      cep: dados.cep,
+      rua: dados.rua,
+      numero_casa: dados.numeroCasa,
+      complemento: dados.complemento,
+      titulo: dados.titulo,
+      descricao: dados.descricao,
+      latitude: dados.latitude,
+      longitude: dados.longitude,
+      fotos: caminhos,
+      miniaturas: miniaturas.length === caminhos.length ? miniaturas : [],
+      autoriza_localizacao: dados.autorizaLocalizacao,
+    };
+    let { data, error } = await sb().from("inscricoes").insert(linha).select().single();
+    if (error && /autoriza_localizacao/.test(error.message)) {
+      // Banco ainda sem a coluna nova (supabase/schema.sql): grava sem ela, e o número/mapa ficam ocultos.
+      console.error("[inscricao] coluna autoriza_localizacao ausente; rode o supabase/schema.sql");
+      const semAutorizacao: Partial<typeof linha> = { ...linha };
+      delete semAutorizacao.autoriza_localizacao;
+      ({ data, error } = await sb().from("inscricoes").insert(semAutorizacao).select().single());
+    }
     falhou("inserir inscrição", error);
     return deLinha(data as Linha);
   },
@@ -146,6 +191,32 @@ export const supabaseStore: Store = {
     const { count, error } = await sb().from("votos").select("*", { count: "exact", head: true });
     falhou("total de votos", error);
     return count ?? 0;
+  },
+  async criarContestacao(dados: NovaContestacao) {
+    const { data, error } = await sb()
+      .from("contestacoes")
+      .insert({
+        protocolo: gerarProtocolo("CT"),
+        protocolo_inscricao: dados.protocoloInscricao,
+        nome: dados.nome,
+        whatsapp: dados.whatsapp,
+        email: dados.email,
+        descricao: dados.descricao,
+        evidencias: dados.evidencias,
+      })
+      .select()
+      .single();
+    falhou("registrar contestação", error);
+    return deLinhaContestacao(data as LinhaContestacao);
+  },
+  async listarContestacoes() {
+    const { data, error } = await sb().from("contestacoes").select("*").order("created_at");
+    falhou("listar contestações", error);
+    return (data as LinhaContestacao[]).map(deLinhaContestacao);
+  },
+  async mudarStatusContestacao(id: string, status: StatusContestacao) {
+    const { error } = await sb().from("contestacoes").update({ status }).eq("id", id);
+    falhou("atualizar contestação", error);
   },
   async lerFase() {
     const { data, error } = await sb().from("configuracoes").select("valor").eq("chave", "fase").maybeSingle();

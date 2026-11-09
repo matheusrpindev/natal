@@ -3,7 +3,7 @@ import { MapPin, Vote } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { nomeCasa, paraPublico } from "@/components/CartaoCasa";
+import { enderecoPublico, nomeCasa, paraPublico } from "@/components/CartaoCasa";
 import { db, faseAtual } from "@/lib/db";
 
 async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
@@ -25,7 +25,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
         <h1 className="font-festiva text-4xl font-bold text-verde sm:text-5xl">{nomeCasa(casa)}</h1>
       </div>
       <p className="mt-2 flex items-center gap-1.5 text-lg text-tinta-suave">
-        <MapPin size={18} className="text-vermelho" aria-hidden /> {casa.rua}, {casa.numeroCasa}
+        <MapPin size={18} className="text-vermelho" aria-hidden /> {enderecoPublico(casa)}
       </p>
       {casa.descricao && <p className="mt-4 text-lg">{casa.descricao}</p>}
       {fase === "votacao" && (

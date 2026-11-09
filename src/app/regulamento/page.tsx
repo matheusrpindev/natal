@@ -1,147 +1,145 @@
 import type { Metadata } from "next";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Fragment } from "react";
 import { MapaArea } from "@/components/MapaArea";
 import { Titulo } from "@/components/Titulo";
-import { DATAS, EVENTO, formatarData } from "@/lib/config";
+import { EVENTO } from "@/lib/config";
 import { RUAS } from "@/lib/ruas";
+import { CRITERIOS_DESEMPATE, REGULAMENTO, RESUMO, type ItemRegulamento } from "./texto";
 
 export const metadata: Metadata = { title: "Regulamento" };
-
-const SECOES: { titulo: string; itens: string[] }[] = [
-  {
-    titulo: "1. Sobre o concurso",
-    itens: [
-      `O ${EVENTO.nome} é um concurso que vai escolher as casas com a decoração de Natal mais bonita do bairro ${EVENTO.local}.`,
-      `É uma iniciativa de ${EVENTO.organizador}, sem custo para participar ou votar.`,
-    ],
-  },
-  {
-    titulo: "2. Quem pode se inscrever",
-    itens: [
-      `Residências localizadas no ${EVENTO.local}, dentro da área e nas ruas listadas abaixo. Cada endereço pode ter uma única inscrição.`,
-      "Na inscrição, o participante marca no mapa onde fica a casa. Essa marcação é usada para conferir a participação e poderá ser usada num mapa das casas participantes.",
-      "A decoração deve estar na fachada, no muro, no quintal ou em janelas, visível da rua.",
-      "A inscrição deve ser feita pelo morador ou com autorização dele.",
-    ],
-  },
-  {
-    titulo: "3. Inscrições",
-    itens: [
-      `As inscrições vão de ${formatarData(DATAS.inscricoesInicio)} a ${formatarData(DATAS.inscricoesFim)}, exclusivamente por este site.`,
-      `É obrigatório enviar de 1 a ${EVENTO.maxFotos} fotos reais da decoração da casa inscrita.`,
-      "A organização confere as inscrições e pode recusar as que não cumprirem este regulamento.",
-      "Cada casa aprovada recebe um número de participante, que aparece na galeria e na votação.",
-    ],
-  },
-  {
-    titulo: "4. Votação",
-    itens: [
-      `A votação vai de ${formatarData(DATAS.votacaoInicio)} a ${formatarData(DATAS.votacaoFim)}, exclusivamente por este site.`,
-      "Qualquer pessoa pode votar, mesmo quem não mora no bairro.",
-      "Cada CPF pode votar uma única vez, em uma única casa. O voto não pode ser alterado.",
-      "É proibido usar CPF de outra pessoa sem autorização, robôs ou qualquer forma de fraude. Votos suspeitos podem ser anulados e a casa beneficiada pode ser desclassificada.",
-      "Os participantes devem manter a decoração montada e, se possível, acesa à noite durante o período de votação.",
-    ],
-  },
-  {
-    titulo: "5. Resultado e premiação",
-    itens: [
-      `O resultado será divulgado em ${formatarData(DATAS.resultado)}, neste site.`,
-      "Vence a casa com mais votos válidos. Em caso de empate, a organização define o critério de desempate.",
-      "Os prêmios serão anunciados pela organização.",
-    ],
-  },
-  {
-    titulo: "6. Uso de imagem e dados pessoais (LGPD)",
-    itens: [
-      "Ao se inscrever, o participante autoriza a publicação das fotos, do nome da rua e do número da casa no site e nas redes sociais do concurso.",
-      "Nome do responsável, telefone e e-mail não são divulgados e são usados só para contato sobre o concurso.",
-      "O CPF dos votantes é guardado apenas de forma criptografada (hash), para garantir um voto por pessoa, e não é compartilhado com ninguém.",
-      "Os dados serão apagados até 90 dias após o fim do concurso.",
-    ],
-  },
-  {
-    titulo: "7. Disposições gerais",
-    itens: ["Casos não previstos neste regulamento serão decididos pela organização."],
-  },
-];
 
 const ordenar = (lista: typeof RUAS) => [...lista].sort((x, y) => x.nome.localeCompare(y.nome, "pt-BR"));
 const INTEIRAS = ordenar(RUAS.filter((r) => r.situacao === "inteira"));
 const PARCIAIS = ordenar(RUAS.filter((r) => r.situacao === "parcial"));
 
-function Secao({ s }: { s: (typeof SECOES)[number] }) {
+/** Converte *trecho* em negrito. */
+function Negrito({ texto }: { texto: string }) {
+  return texto.split(/\*([^*]+)\*/g).map((parte, i) => (i % 2 ? <strong key={i}>{parte}</strong> : <Fragment key={i}>{parte}</Fragment>));
+}
+
+function Paragrafo({ texto }: { texto: string }) {
+  const m = texto.match(/^(\d+\.\d+\.)\s+([\s\S]*)$/);
+  if (!m) return <p>{<Negrito texto={texto} />}</p>;
   return (
-    <section>
-      <h2 className="text-xl font-extrabold text-vermelho">{s.titulo}</h2>
-      <ul className="mt-3 list-disc space-y-2 pl-5">
-        {s.itens.map((i) => (
-          <li key={i}>{i}</li>
-        ))}
-      </ul>
-    </section>
+    <p className="grid grid-cols-[3.25rem_1fr] gap-1">
+      <span className="font-extrabold text-verde tabular-nums">{m[1]}</span>
+      <span>
+        <Negrito texto={m[2]} />
+      </span>
+    </p>
   );
 }
 
-function AreaDoConcurso() {
+function ListaDeRuas({ titulo, ruas }: { titulo: string; ruas: typeof RUAS }) {
   return (
-    <section id="area" className="scroll-mt-6">
-      <h2 className="text-xl font-extrabold text-vermelho">Área do concurso e ruas participantes</h2>
-      <p className="mt-3">
-        Participam as casas dentro do contorno vermelho. Passe o dedo ou o mouse sobre uma rua para ver o nome.
-      </p>
-      <div className="mt-4">
+    <div>
+      <h3 className="font-extrabold">{titulo}</h3>
+      <ul className="mt-2 space-y-1 text-sm">
+        {ruas.map((r) => (
+          <li key={r.nome} className="flex justify-between gap-3 border-b border-borda pb-1">
+            <span>{r.nome}</span>
+            <span className="shrink-0 text-tinta-suave tabular-nums">{r.cep ?? "sem CEP informado"}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Item({ item }: { item: ItemRegulamento }) {
+  if (typeof item === "string") return <Paragrafo texto={item} />;
+  if (item.tipo === "link")
+    return (
+      <Link href={item.href} className="btn btn-verde sm:ml-[3.25rem]">
+        {item.texto} <ArrowRight size={18} aria-hidden />
+      </Link>
+    );
+  if (item.tipo === "mapa")
+    return (
+      <div>
         <MapaArea />
+        <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-tinta-suave">
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-1.5 w-6 rounded bg-dourado" /> rua integralmente incluída
+          </span>
+          <span className="flex items-center gap-2">
+            <span className="inline-block h-1.5 w-6 rounded border-t-2 border-dashed border-[#ffb38a]" /> rua parcialmente
+            incluída
+          </span>
+          <span>Passe o dedo ou o mouse sobre uma rua para ver o nome.</span>
+        </p>
       </div>
-      <p className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-tinta-suave">
-        <span className="flex items-center gap-2">
-          <span className="inline-block h-1.5 w-6 rounded bg-dourado" /> rua inteira na área
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="inline-block h-1.5 w-6 rounded border-t-2 border-dashed border-[#ffb38a]" /> só um trecho na área
-        </span>
-      </p>
-      <div className="mt-6 grid gap-6 sm:grid-cols-2">
-        <div>
-          <h3 className="font-extrabold">Ruas inteiras ({INTEIRAS.length})</h3>
-          <ul className="mt-2 space-y-1 text-sm">
-            {INTEIRAS.map((r) => (
-              <li key={r.nome} className="flex justify-between gap-3 border-b border-borda pb-1">
-                <span>{r.nome}</span>
-                <span className="text-tinta-suave tabular-nums">{r.cep ?? "—"}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <h3 className="font-extrabold">Só um trecho ({PARCIAIS.length})</h3>
-          <p className="mt-1 text-sm text-tinta-suave">Participa só a parte da rua que fica dentro do contorno.</p>
-          <ul className="mt-2 space-y-1 text-sm">
-            {PARCIAIS.map((r) => (
-              <li key={r.nome} className="flex justify-between gap-3 border-b border-borda pb-1">
-                <span>{r.nome}</span>
-                <span className="text-tinta-suave tabular-nums">{r.cep ?? "—"}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+    );
+  if (item.tipo === "ruas")
+    return (
+      <div className="grid gap-6 rounded-xl bg-creme p-4 sm:grid-cols-2">
+        <ListaDeRuas titulo={`Ruas integralmente incluídas (${INTEIRAS.length})`} ruas={INTEIRAS} />
+        <ListaDeRuas titulo={`Ruas parcialmente incluídas (${PARCIAIS.length})`} ruas={PARCIAIS} />
       </div>
-    </section>
+    );
+  return (
+    <table className="w-full overflow-hidden rounded-xl text-left text-sm sm:ml-[3.25rem] sm:w-[calc(100%-3.25rem)]">
+      <thead className="bg-verde text-white">
+        <tr>
+          <th className="px-4 py-2 font-extrabold">Critério</th>
+          <th className="px-4 py-2 text-right font-extrabold">Peso</th>
+        </tr>
+      </thead>
+      <tbody>
+        {CRITERIOS_DESEMPATE.map(([c, p]) => (
+          <tr key={c} className="border-b border-borda bg-creme">
+            <td className="px-4 py-2">{c}</td>
+            <td className="px-4 py-2 text-right font-bold tabular-nums">{p}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
 export default function PaginaRegulamento() {
   return (
     <>
-      <Titulo titulo="Regulamento" subtitulo={`${EVENTO.nome} ${EVENTO.ano}`} />
+      <Titulo titulo="Regulamento oficial" subtitulo={`${EVENTO.nome} — ${EVENTO.ano}`} />
       <div className="mx-auto max-w-3xl px-4 py-10">
-        <div className="cartao space-y-8 p-6 sm:p-10">
-          {SECOES.slice(0, 2).map((s) => (
-            <Secao key={s.titulo} s={s} />
+        <nav aria-label="Seções do regulamento" className="cartao mb-6 p-5 sm:p-6">
+          <p className="text-sm font-extrabold tracking-widest text-verde uppercase">Índice</p>
+          <ol className="mt-3 grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2">
+            {REGULAMENTO.map((s) => (
+              <li key={s.numero}>
+                <a href={s.numero === 3 ? "#area" : `#secao-${s.numero}`} className="hover:text-vermelho hover:underline">
+                  {s.numero}. {s.titulo}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+        <div className="cartao space-y-10 p-6 sm:p-10">
+          {REGULAMENTO.map((s) => (
+            <section key={s.numero} id={s.numero === 3 ? "area" : `secao-${s.numero}`} className="scroll-mt-6">
+              <h2 className="text-xl font-extrabold text-vermelho uppercase">
+                {s.numero}. {s.titulo}
+              </h2>
+              <div className="mt-4 space-y-3">
+                {s.itens.map((item, i) => (
+                  <Item key={i} item={item} />
+                ))}
+              </div>
+            </section>
           ))}
-          <AreaDoConcurso />
-          {SECOES.slice(2).map((s) => (
-            <Secao key={s.titulo} s={s} />
-          ))}
+          <dl className="grid gap-x-6 gap-y-2 rounded-2xl bg-verde p-6 text-white sm:grid-cols-[auto_1fr]">
+            <p className="font-festiva text-2xl text-dourado sm:col-span-2">
+              {EVENTO.nome} — {EVENTO.ano}
+            </p>
+            {RESUMO.map(([k, v]) => (
+              <Fragment key={k}>
+                <dt className="font-extrabold">{k}</dt>
+                <dd className="text-white/90">{v}</dd>
+              </Fragment>
+            ))}
+          </dl>
         </div>
       </div>
     </>
