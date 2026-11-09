@@ -24,14 +24,14 @@ const ETAPAS = [
     cor: "verde" as const,
     titulo: "Votação",
     quando: `${formatarData(DATAS.votacaoInicio)} a ${formatarData(DATAS.votacaoFim)}`,
-    texto: "Qualquer pessoa pode votar: é um voto por CPF. Passeie pela região e escolha a sua favorita!",
+    texto: "Qualquer pessoa pode votar: é um voto por CPF. Passeie pelo bairro e escolha a sua favorita!",
   },
   {
     icone: Trophy,
     cor: "dourado" as const,
     titulo: "Resultado",
     quando: formatarData(DATAS.resultado),
-    texto: "Divulgação das casas mais iluminadas do Scaffid II e região e entrega dos prêmios.",
+    texto: "Divulgação das casas mais iluminadas do Scaffid II e entrega dos prêmios.",
   },
 ];
 
@@ -100,7 +100,7 @@ export default function Inicio() {
             />
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-white/85 sm:text-xl">
-            Vamos encher a região de luz! Decore sua casa, inscreva-se e concorra ao título de{" "}
+            Vamos encher o bairro de luz! Decore sua casa, inscreva-se e concorra ao título de{" "}
             <strong className="text-dourado">casa mais bonita do Natal</strong>.
           </p>
           <Iniciativa className="mt-6" />
@@ -177,7 +177,7 @@ export default function Inicio() {
               <Selo icone={Vote} cor="verde" tamanho={40} /> Sobre a votação
             </h3>
             <ul className="mt-3 list-disc space-y-1.5 pl-5 text-tinta-suave">
-              <li>Qualquer pessoa pode votar, morando ou não na região.</li>
+              <li>Qualquer pessoa pode votar, morando ou não no bairro.</li>
               <li>Cada CPF vale um voto. Não é possível trocar o voto depois.</li>
               <li>Seu CPF fica guardado de forma criptografada e serve só para evitar votos repetidos.</li>
               <li>O resultado será divulgado no dia {formatarData(DATAS.resultado)}.</li>

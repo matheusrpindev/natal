@@ -1,4 +1,4 @@
-import { BAIRROS_DA_AREA, ruaPorCep, ruaPorNome, type Rua } from "./ruas";
+import { CEPS_BAIRRO_FORA_DA_AREA, ruaPorCep, type Rua } from "./ruas";
 
 export interface EnderecoCep {
   cep: string;
@@ -24,8 +24,7 @@ export async function buscarCep(cep: string): Promise<EnderecoCep | null> {
 export type ResultadoParticipacao =
   | { status: "sim"; rua: Rua }
   | { status: "parcial"; rua: Rua }
-  /** A rua não está na lista, mas o bairro tem parte dentro da área: conferir no mapa. */
-  | { status: "conferir"; endereco: EnderecoCep }
+  | { status: "bairro-fora"; endereco: EnderecoCep | null }
   | { status: "fora"; endereco: EnderecoCep | null }
   | { status: "nao-encontrado" };
 
@@ -35,11 +34,7 @@ export async function verificarCep(cep: string): Promise<ResultadoParticipacao> 
   if (rua) return { status: rua.situacao === "inteira" ? "sim" : "parcial", rua };
   const endereco = await buscarCep(cep);
   if (!endereco) return { status: "nao-encontrado" };
-  if (endereco.localidade === "Itaquaquecetuba") {
-    // CEP que não está na lista, mas de uma rua que está (ex.: outra faixa de numeração).
-    const mesmaRua = ruaPorNome(endereco.logradouro);
-    if (mesmaRua) return { status: mesmaRua.situacao === "inteira" ? "sim" : "parcial", rua: mesmaRua };
-    if (BAIRROS_DA_AREA.includes(endereco.bairro)) return { status: "conferir", endereco };
-  }
+  const d = soDigitosCep(cep);
+  if (CEPS_BAIRRO_FORA_DA_AREA.some((c) => soDigitosCep(c) === d)) return { status: "bairro-fora", endereco };
   return { status: "fora", endereco };
 }

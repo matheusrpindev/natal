@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { ListaRuas } from "@/components/ListaRuas";
 import { MapaArea } from "@/components/MapaArea";
 import { Titulo } from "@/components/Titulo";
 import { DATAS, EVENTO, formatarData } from "@/lib/config";
+import { RUAS } from "@/lib/ruas";
 
 export const metadata: Metadata = { title: "Regulamento" };
 
@@ -10,14 +10,14 @@ const SECOES: { titulo: string; itens: string[] }[] = [
   {
     titulo: "1. Sobre o concurso",
     itens: [
-      `O ${EVENTO.nome} é um concurso que vai escolher as casas com a decoração de Natal mais bonita da região do ${EVENTO.local}.`,
+      `O ${EVENTO.nome} é um concurso que vai escolher as casas com a decoração de Natal mais bonita do bairro ${EVENTO.local}.`,
       `É uma iniciativa de ${EVENTO.organizador}, sem custo para participar ou votar.`,
     ],
   },
   {
     titulo: "2. Quem pode se inscrever",
     itens: [
-      "Residências localizadas dentro da área do concurso (contorno vermelho no mapa abaixo), que inclui o Scaffid II e bairros vizinhos. Cada endereço pode ter uma única inscrição.",
+      `Residências localizadas no ${EVENTO.local}, dentro da área e nas ruas listadas abaixo. Cada endereço pode ter uma única inscrição.`,
       "Na inscrição, o participante marca no mapa onde fica a casa. Essa marcação é usada para conferir a participação e poderá ser usada num mapa das casas participantes.",
       "A decoração deve estar na fachada, no muro, no quintal ou em janelas, visível da rua.",
       "A inscrição deve ser feita pelo morador ou com autorização dele.",
@@ -36,7 +36,7 @@ const SECOES: { titulo: string; itens: string[] }[] = [
     titulo: "4. Votação",
     itens: [
       `A votação vai de ${formatarData(DATAS.votacaoInicio)} a ${formatarData(DATAS.votacaoFim)}, exclusivamente por este site.`,
-      "Qualquer pessoa pode votar, mesmo quem não mora na região.",
+      "Qualquer pessoa pode votar, mesmo quem não mora no bairro.",
       "Cada CPF pode votar uma única vez, em uma única casa. O voto não pode ser alterado.",
       "É proibido usar CPF de outra pessoa sem autorização, robôs ou qualquer forma de fraude. Votos suspeitos podem ser anulados e a casa beneficiada pode ser desclassificada.",
       "Os participantes devem manter a decoração montada e, se possível, acesa à noite durante o período de votação.",
@@ -65,6 +65,10 @@ const SECOES: { titulo: string; itens: string[] }[] = [
   },
 ];
 
+const ordenar = (lista: typeof RUAS) => [...lista].sort((x, y) => x.nome.localeCompare(y.nome, "pt-BR"));
+const INTEIRAS = ordenar(RUAS.filter((r) => r.situacao === "inteira"));
+const PARCIAIS = ordenar(RUAS.filter((r) => r.situacao === "parcial"));
+
 function Secao({ s }: { s: (typeof SECOES)[number] }) {
   return (
     <section>
@@ -83,8 +87,7 @@ function AreaDoConcurso() {
     <section id="area" className="scroll-mt-6">
       <h2 className="text-xl font-extrabold text-vermelho">Área do concurso e ruas participantes</h2>
       <p className="mt-3">
-        Participam as casas dentro do contorno vermelho: o Scaffid II e bairros vizinhos, como Chácara Cuiabá, Jardim Caiubi e Jardim
-        Carolina. Passe o dedo ou o mouse sobre uma rua para ver o nome.
+        Participam as casas dentro do contorno vermelho. Passe o dedo ou o mouse sobre uma rua para ver o nome.
       </p>
       <div className="mt-4">
         <MapaArea />
@@ -97,7 +100,31 @@ function AreaDoConcurso() {
           <span className="inline-block h-1.5 w-6 rounded border-t-2 border-dashed border-[#ffb38a]" /> só um trecho na área
         </span>
       </p>
-      <ListaRuas />
+      <div className="mt-6 grid gap-6 sm:grid-cols-2">
+        <div>
+          <h3 className="font-extrabold">Ruas inteiras ({INTEIRAS.length})</h3>
+          <ul className="mt-2 space-y-1 text-sm">
+            {INTEIRAS.map((r) => (
+              <li key={r.nome} className="flex justify-between gap-3 border-b border-borda pb-1">
+                <span>{r.nome}</span>
+                <span className="text-tinta-suave tabular-nums">{r.cep ?? "—"}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h3 className="font-extrabold">Só um trecho ({PARCIAIS.length})</h3>
+          <p className="mt-1 text-sm text-tinta-suave">Participa só a parte da rua que fica dentro do contorno.</p>
+          <ul className="mt-2 space-y-1 text-sm">
+            {PARCIAIS.map((r) => (
+              <li key={r.nome} className="flex justify-between gap-3 border-b border-borda pb-1">
+                <span>{r.nome}</span>
+                <span className="text-tinta-suave tabular-nums">{r.cep ?? "—"}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </section>
   );
 }
