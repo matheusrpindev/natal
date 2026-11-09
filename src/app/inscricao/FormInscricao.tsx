@@ -41,6 +41,12 @@ function AvisoCep({ r }: { r: ResultadoParticipacao }) {
         <CircleHelp size={16} aria-hidden /> Só um trecho dessa rua participa. Confira no mapa se a casa fica dentro do contorno.
       </span>
     );
+  if (r.status === "conferir")
+    return (
+      <span className="flex items-center gap-1.5 text-sm font-bold text-dourado-escuro">
+        <CircleHelp size={16} aria-hidden /> Parte do bairro {r.endereco.bairro} participa. Confira no mapa se a casa fica dentro do contorno.
+      </span>
+    );
   if (r.status === "nao-encontrado")
     return (
       <span className="flex items-center gap-1.5 text-sm font-bold text-vermelho">
@@ -79,7 +85,7 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
           setRuaFoco(resultado.rua);
         } else {
           setRuaFoco(null);
-          if ((resultado.status === "fora" || resultado.status === "bairro-fora") && resultado.endereco?.logradouro) {
+          if ((resultado.status === "fora" || resultado.status === "conferir") && resultado.endereco?.logradouro) {
             setRua(resultado.endereco.logradouro);
           }
         }

@@ -97,7 +97,24 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
           </div>
         )}
 
-        {(resultado?.status === "bairro-fora" || resultado?.status === "fora") && (
+        {resultado?.status === "conferir" && (
+          <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-dourado/20 p-5">
+            <div>
+              <p className="flex items-center gap-2 text-xl font-extrabold text-dourado-escuro">
+                <CircleHelp aria-hidden /> Confira no mapa.
+              </p>
+              <p className="mt-1">
+                Não achamos a <strong>{endereco(resultado.endereco.logradouro || "sua rua")}</strong> na nossa lista, mas parte do
+                bairro {resultado.endereco.bairro} fica dentro da área. Se a sua casa estiver dentro do contorno vermelho, pode
+                participar.
+              </p>
+              {chamada}
+            </div>
+            <MapaArea altura="h-72 sm:h-96" />
+          </div>
+        )}
+
+        {resultado?.status === "fora" && (
           <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-vermelho/10 p-5">
             <div>
               <p className="flex items-center gap-2 text-xl font-extrabold text-vermelho">
@@ -108,9 +125,7 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
                   <>
                     <strong>{endereco(resultado.endereco.logradouro || "Esse endereço")}</strong>
                     {resultado.endereco.bairro && ` (${resultado.endereco.bairro})`}
-                    {resultado.status === "bairro-fora"
-                      ? " é do Scaffid II, mas não está entre as ruas desta edição. Veja a área no mapa:"
-                      : " não está na área do concurso. Veja no mapa as ruas que participam:"}
+                    {" não está na área do concurso. Veja no mapa as ruas que participam:"}
                   </>
                 ) : (
                   "Veja no mapa as ruas que participam:"

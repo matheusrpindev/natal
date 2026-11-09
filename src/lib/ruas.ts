@@ -1,435 +1,55 @@
 /**
  * Ruas que participam do concurso (dentro da área de src/lib/area.ts).
- * Gerado a partir do OpenStreetMap (traçado) + ViaCEP/Correios (nome oficial e CEP).
+ * Os dados ficam em ruas-dados.json, gerado a partir do OpenStreetMap (traçado, recortado
+ * no contorno da área) + ViaCEP/Correios (nome oficial, CEP e bairro).
  * - "inteira": a rua toda fica dentro da área
  * - "parcial": só um trecho fica dentro (a casa precisa ser conferida no mapa)
  */
+import dados from "./ruas-dados.json";
+
 export type SituacaoRua = "inteira" | "parcial";
 
 export interface Rua {
   nome: string;
-  cep: string | null;
+  /** CEPs da rua (ruas longas podem ter um CEP por faixa de numeração). Vazio quando não achamos. */
+  ceps: string[];
+  bairro: string | null;
   situacao: SituacaoRua;
-  /** Trechos da rua: listas de [latitude, longitude] */
+  /** Trechos da rua dentro da área: listas de [latitude, longitude] */
   tracado: [number, number][][];
 }
 
-export const RUAS: Rua[] = [
-  {
-    nome: "Rua Araruna",
-    cep: "08587-790",
-    situacao: "parcial",
-    tracado: [
-      [
-        [-23.430442, -46.30977],
-        [-23.430585, -46.310203],
-      ],
-      [
-        [-23.430585, -46.310203],
-        [-23.430657, -46.310519],
-        [-23.43074, -46.310839],
-        [-23.431014, -46.311932],
-        [-23.431049, -46.312117],
-        [-23.431071, -46.31225],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Coronel Fabriciano",
-    cep: "08587-761",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.43026, -46.311126],
-        [-23.429704, -46.311187],
-        [-23.428399, -46.311361],
-        [-23.427795, -46.311443],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Coronel Freitas",
-    cep: "08587-760",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.429728, -46.310573],
-        [-23.429187, -46.310628],
-        [-23.427851, -46.310814],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Coronel João Sá",
-    cep: "08587-767",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.429213, -46.310015],
-        [-23.428695, -46.310047],
-        [-23.428088, -46.310148],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Coronel Pacheco",
-    cep: "08587-765",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.429187, -46.310628],
-        [-23.429202, -46.310344],
-        [-23.429213, -46.310015],
-        [-23.429233, -46.309856],
-        [-23.429223, -46.309665],
-        [-23.429125, -46.309261],
-        [-23.428776, -46.308002],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Coronel Xavier Chaves",
-    cep: "08587-763",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.429704, -46.311187],
-        [-23.429728, -46.310573],
-        [-23.429805, -46.310034],
-        [-23.429815, -46.309833],
-        [-23.429805, -46.30965],
-        [-23.429768, -46.309463],
-        [-23.429672, -46.30909],
-        [-23.429413, -46.308103],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Cândido Rodrigues",
-    cep: "08587-777",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.43017, -46.311779],
-        [-23.428528, -46.311997],
-        [-23.427852, -46.312093],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Delfim Moreira",
-    cep: "08587-797",
-    situacao: "parcial",
-    tracado: [
-      [
-        [-23.433338, -46.31117],
-        [-23.431521, -46.310905],
-        [-23.431251, -46.31087],
-        [-23.43074, -46.310839],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Delmiro Gouveia",
-    cep: "08587-798",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.430585, -46.310203],
-        [-23.430384, -46.31019],
-      ],
-      [
-        [-23.433662, -46.310584],
-        [-23.431791, -46.31031],
-        [-23.431189, -46.310241],
-        [-23.430585, -46.310203],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Demerval Lobão",
-    cep: "08587-800",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.431189, -46.310241],
-        [-23.431072, -46.30976],
-        [-23.430661, -46.308293],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Dom Expedito Lopes",
-    cep: "08587-801",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.431791, -46.31031],
-        [-23.431646, -46.309675],
-        [-23.431466, -46.309007],
-        [-23.431277, -46.308344],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Dom Feliciano",
-    cep: "08587-802",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.433858, -46.309959],
-        [-23.431646, -46.309675],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Domingos Martins",
-    cep: "08587-804",
-    situacao: "parcial",
-    tracado: [
-      [
-        [-23.433992, -46.308742],
-        [-23.433974, -46.309041],
-        [-23.433939, -46.309347],
-        [-23.433858, -46.309959],
-        [-23.433737, -46.310377],
-        [-23.433662, -46.310584],
-      ],
-      [
-        [-23.433662, -46.310584],
-        [-23.433582, -46.310797],
-        [-23.433552, -46.310859],
-        [-23.433374, -46.311091],
-        [-23.433338, -46.31117],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Farias Brito",
-    cep: "08587-782",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.428244, -46.306632],
-        [-23.428485, -46.306649],
-        [-23.430193, -46.30692],
-        [-23.430594, -46.307003],
-        [-23.432175, -46.307186],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Farias Lemos",
-    cep: "08587-780",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.428324, -46.307277],
-        [-23.430332, -46.307576],
-        [-23.432007, -46.307806],
-        [-23.432113, -46.307838],
-        [-23.4322, -46.307926],
-        [-23.432301, -46.308066],
-        [-23.432504, -46.308365],
-        [-23.432623, -46.308532],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Felício dos Santos",
-    cep: "08587-784",
-    situacao: "parcial",
-    tracado: [
-      [
-        [-23.428339, -46.30543],
-        [-23.42841, -46.305544],
-        [-23.428469, -46.305703],
-        [-23.428503, -46.305914],
-        [-23.428525, -46.306122],
-        [-23.428519, -46.306328],
-        [-23.428485, -46.306649],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Fernandes Prestes",
-    cep: "08587-788",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.429142, -46.305664],
-        [-23.429199, -46.305743],
-        [-23.429261, -46.305792],
-        [-23.429357, -46.305851],
-        [-23.429449, -46.305884],
-        [-23.429538, -46.305904],
-        [-23.429633, -46.305897],
-        [-23.429857, -46.305824],
-        [-23.430353, -46.305653],
-        [-23.430693, -46.305504],
-        [-23.430881, -46.305386],
-        [-23.431123, -46.305243],
-        [-23.431315, -46.305154],
-        [-23.431411, -46.305115],
-        [-23.431534, -46.305088],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Fernandes Tourino",
-    cep: "08587-786",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.430193, -46.30692],
-        [-23.430125, -46.306849],
-        [-23.430116, -46.306762],
-        [-23.430189, -46.306548],
-        [-23.430282, -46.306355],
-        [-23.430475, -46.305971],
-        [-23.430537, -46.30583],
-        [-23.430693, -46.305504],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Guiricema",
-    cep: "08587-778",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.430094, -46.312391],
-        [-23.429358, -46.312484],
-        [-23.428821, -46.312564],
-        [-23.428454, -46.312606],
-        [-23.428336, -46.31261],
-        [-23.428086, -46.3126],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Henrique Giovanni Xavier",
-    cep: "08587-770",
-    situacao: "parcial",
-    tracado: [
-      [
-        [-23.430146, -46.313805],
-        [-23.430088, -46.313009],
-        [-23.430082, -46.312925],
-        [-23.430084, -46.312829],
-        [-23.430083, -46.312704],
-        [-23.430094, -46.312391],
-        [-23.43017, -46.311779],
-        [-23.43026, -46.311126],
-        [-23.430331, -46.310648],
-        [-23.430384, -46.31019],
-        [-23.430442, -46.30977],
-        [-23.430332, -46.309288],
-        [-23.43011, -46.308537],
-        [-23.430066, -46.308317],
-        [-23.430061, -46.308192],
-        [-23.430079, -46.308084],
-        [-23.430125, -46.307959],
-        [-23.430332, -46.307576],
-        [-23.430594, -46.307003],
-        [-23.431019, -46.30619],
-        [-23.431437, -46.305381],
-        [-23.43148, -46.305294],
-        [-23.431506, -46.305204],
-        [-23.431534, -46.305088],
-        [-23.431541, -46.3049],
-        [-23.431471, -46.304712],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Lima Duarte",
-    cep: "08587-803",
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.433939, -46.309347],
-        [-23.431466, -46.309007],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Remanso",
-    cep: "08587-768",
-    situacao: "parcial",
-    tracado: [
-      [
-        [-23.428221, -46.308085],
-        [-23.428221, -46.30818],
-        [-23.428238, -46.308286],
-        [-23.428695, -46.310047],
-      ],
-    ],
-  },
-  {
-    nome: "Rua Rosa de Sharon",
-    cep: "08587-810",
-    situacao: "parcial",
-    tracado: [
-      [
-        [-23.436446, -46.307896],
-        [-23.436343, -46.307912],
-        [-23.436212, -46.307932],
-        [-23.435981, -46.307982],
-        [-23.435723, -46.308044],
-        [-23.435627, -46.308079],
-        [-23.434827, -46.308477],
-        [-23.434261, -46.308751],
-        [-23.434169, -46.308766],
-        [-23.434077, -46.30876],
-        [-23.433992, -46.308742],
-        [-23.432623, -46.308532],
-        [-23.431277, -46.308344],
-        [-23.430661, -46.308293],
-        [-23.430061, -46.308192],
-        [-23.429413, -46.308103],
-        [-23.428776, -46.308002],
-        [-23.428349, -46.307953],
-        [-23.428284, -46.307978],
-        [-23.428245, -46.308018],
-        [-23.428221, -46.308085],
-      ],
-    ],
-  },
-  {
-    nome: "Viela Quatro",
-    cep: null,
-    situacao: "inteira",
-    tracado: [
-      [
-        [-23.429768, -46.309463],
-        [-23.430332, -46.309288],
-      ],
-    ],
-  },
-];
+export const RUAS = dados as Rua[];
 
-/** CEPs do bairro Parque Residencial Scaffid II que ficam FORA da área desta edição. */
-export const CEPS_BAIRRO_FORA_DA_AREA: string[] = [
-  "08587-774",
-  "08587-775",
-  "08587-776",
-  "08587-779",
-  "08587-792",
-  "08587-794",
-  "08587-796",
-  "08587-805",
-  "08587-817",
-  "08587-818",
-  "08587-819",
-  "08587-820",
-];
+/** Bairros (pelos Correios) que têm ruas dentro da área. */
+export const BAIRROS_DA_AREA = [
+  ...new Set(RUAS.map((r) => r.bairro).filter((b): b is string => !!b)),
+].sort((a, b) => a.localeCompare(b, "pt-BR"));
 
 const soDigitos = (v: string) => v.replace(/\D/g, "");
 
+/** Nome sem acentos, minúsculo e sem o tipo (Rua, Avenida...), para comparar nomes de rua. */
+export function nomeComparavel(nome: string) {
+  return nome
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(
+      /^(rua|avenida|av\.?|estrada|alameda|viela|travessa|rodovia)\s+/,
+      "",
+    )
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function ruaPorCep(cep: string): Rua | null {
   const d = soDigitos(cep);
-  return RUAS.find((r) => r.cep && soDigitos(r.cep) === d) ?? null;
+  return RUAS.find((r) => r.ceps.some((c) => soDigitos(c) === d)) ?? null;
+}
+
+export function ruaPorNome(nome: string): Rua | null {
+  const n = nomeComparavel(nome);
+  return n ? (RUAS.find((r) => nomeComparavel(r.nome) === n) ?? null) : null;
 }
 
 /** Centro aproximado do trecho da rua que fica dentro da área (para posicionar o mapa). */

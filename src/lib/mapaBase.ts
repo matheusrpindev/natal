@@ -84,18 +84,21 @@ export function destacarRua(L: L, mapa: Leaflet.Map, rua: Rua) {
     .addTo(mapa);
 }
 
-/** Desenha todas as ruas participantes, com o nome ao passar o dedo/mouse. */
+/** Desenha todas as ruas participantes, com o nome ao passar o dedo/mouse. Linhas mais finas com o mapa afastado. */
 export function desenharRuas(L: L, mapa: Leaflet.Map) {
-  return RUAS.map((r) =>
+  const espessura = () => (mapa.getZoom() >= 17 ? 5 : mapa.getZoom() >= 16 ? 3 : 1.5);
+  const linhas = RUAS.map((r) =>
     L.polyline(r.tracado, {
       color: r.situacao === "inteira" ? "#f4c542" : "#ffb38a",
-      weight: 5,
+      weight: espessura(),
       opacity: 0.85,
       dashArray: r.situacao === "parcial" ? "6 6" : undefined,
     })
       .bindTooltip(r.nome + (r.situacao === "parcial" ? " (trecho)" : ""), { sticky: true })
       .addTo(mapa),
   );
+  mapa.on("zoomend", () => linhas.forEach((l) => l.setStyle({ weight: espessura() })));
+  return linhas;
 }
 
 /**

@@ -47,8 +47,8 @@ O arquivo `vercel.json` agenda uma chamada diária a `/api/saude`, que consulta 
 
 - **Datas, nome e organizador**: `src/lib/config.ts`
 - **Fonte dos títulos (P22 Yule Heavy Snow)**: coloque o arquivo em `public/fonts/p22-yule-heavy-snow.woff2` (veja `public/fonts/LEIA-ME.txt`). Sem o arquivo, os títulos usam a Mountains of Christmas.
-- **Área do concurso (mapa da inscrição)**: contorno em `src/lib/area.ts`, reproduzido do desenho no Google Earth. Para deixar exato, exporte o desenho como KML e troque os pontos. A inscrição só é aceita com a casa marcada dentro da área (conferido também no servidor).
-- **Ruas participantes**: `src/lib/ruas.ts` (nome oficial e CEP dos Correios, traçado do OpenStreetMap; "inteira" ou "parcial"). Aparecem no regulamento, no "Minha casa pode participar?" da página inicial e no preenchimento do CEP da inscrição.
+- **Área do concurso (mapa da inscrição)**: contorno em `src/lib/area.ts`, reproduzido do desenho no Google Maps (Scaffid II e bairros vizinhos, entre a Rodovia Ayrton Senna e a Estrada Alberto Hinoto). Para deixar exato, exporte o desenho como KML e troque os pontos. A inscrição só é aceita com a casa marcada dentro da área (conferido também no servidor).
+- **Ruas participantes**: `src/lib/ruas-dados.json`, lido por `src/lib/ruas.ts` (cerca de 200 ruas; nome oficial, CEPs e bairro dos Correios, traçado do OpenStreetMap recortado na área; "inteira" ou "parcial"). Um CEP que não está na lista, mas é de um bairro com parte na área, recebe "confira no mapa". Aparecem no regulamento, no "Minha casa pode participar?" da página inicial e no preenchimento do CEP da inscrição.
 - **Foto do Marcos**: salve em `public/marcos.jpg` (aparece na seção "Uma iniciativa de" da página inicial).
 - **Logo**: salve em `public/logo.png` e siga o comentário em `src/components/Logo.tsx`
 - **Prêmios**: seção "Prêmios" em `src/app/page.tsx`

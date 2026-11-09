@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(urlSite),
   title: { default: EVENTO.nome, template: `%s · ${EVENTO.nome}` },
   openGraph: { type: "website", locale: "pt_BR", siteName: EVENTO.nome },
-  description: `Concurso da casa com a decoração de Natal mais bonita do ${EVENTO.local}. Uma iniciativa de ${EVENTO.organizador}.`,
+  description: `Concurso da casa com a decoração de Natal mais bonita do ${EVENTO.local} e região. Uma iniciativa de ${EVENTO.organizador}.`,
 };
 
 export const viewport: Viewport = { themeColor: "#061f15" };
