@@ -9,6 +9,7 @@ import { formatarDataHora } from "@/lib/config";
 import { db, faseAtual, usandoSupabase, type Contestacao, type Inscricao, type StatusInscricao } from "@/lib/db";
 import { NOME_FASE } from "@/lib/phase";
 import { ranking } from "@/lib/ranking";
+import { LISTA_REGIOES, REGIOES, regiaoOuNula, type RegiaoId } from "@/lib/regioes";
 import { marcarContestacao, sair } from "./actions";
 import { BotoesStatus } from "./BotoesStatus";
 import { Login } from "./Login";
@@ -122,18 +123,40 @@ function Contestacoes({ lista }: { lista: Contestacao[] }) {
   );
 }
 
-async function Painel() {
+function AbasRegiao({ atual, contagem }: { atual: RegiaoId; contagem: Record<RegiaoId, number> }) {
+  return (
+    <nav aria-label="Região" className="flex flex-wrap gap-2">
+      {LISTA_REGIOES.map((r) => (
+        <a
+          key={r.id}
+          href={`/admin?regiao=${r.id}`}
+          aria-current={r.id === atual ? "page" : undefined}
+          className={`rounded-full px-5 py-2.5 font-extrabold ${r.id === atual ? "bg-verde text-white" : "bg-white text-verde ring-2 ring-verde/30 hover:ring-verde"}`}
+        >
+          {r.nome} <span className="opacity-75">({contagem[r.id]})</span>
+        </a>
+      ))}
+    </nav>
+  );
+}
+
+async function Painel({ searchParams }: { searchParams: Promise<{ regiao?: string | string[] }> }) {
   if (!(await estaLogado())) return <Login />;
+  const regiao = regiaoOuNula((await searchParams).regiao) ?? REGIOES["scaffid-ii"];
   const store = await db();
-  const [inscricoes, { fase }, { lista, total }, contestacoes] = await Promise.all([
+  const [todas, { fase }, { lista, total }, todasContestacoes, erroEsquema] = await Promise.all([
     store.listarInscricoes(),
     faseAtual(),
-    ranking(),
+    ranking(regiao.id),
     store.listarContestacoes().catch((e) => {
       console.error("[admin] contestações", e);
       return [] as Contestacao[];
     }),
+    store.verificarEsquema().catch((e: Error) => e.message),
   ]);
+  const inscricoes = todas.filter((i) => i.regiao === regiao.id);
+  const contestacoes = todasContestacoes.filter((c) => c.regiao === regiao.id);
+  const contagem = Object.fromEntries(LISTA_REGIOES.map((r) => [r.id, todas.filter((i) => i.regiao === r.id).length])) as Record<RegiaoId, number>;
   const urlFoto = (c: string) => store.urlFoto(c);
   const conta = (s: StatusInscricao) => inscricoes.filter((i) => i.status === s).length;
 
@@ -145,6 +168,18 @@ async function Painel() {
           <button className="btn btn-contorno px-4 py-2 text-sm text-tinta-suave">Sair</button>
         </form>
       </div>
+
+      {erroEsquema && (
+        <p className="flex items-start gap-2 rounded-xl bg-vermelho/10 p-4 text-sm font-bold text-vermelho">
+          <TriangleAlert size={18} className="shrink-0" aria-hidden />
+          <span>
+            O banco de dados está desatualizado para esta versão do site. Rode o arquivo <code>supabase/schema.sql</code> no SQL
+            Editor do Supabase. Detalhe: {erroEsquema}
+          </span>
+        </p>
+      )}
+
+      <AbasRegiao atual={regiao.id} contagem={contagem} />
 
       {!usandoSupabase && (
         <p className="flex items-start gap-2 rounded-xl bg-dourado/25 p-4 text-sm">
@@ -182,13 +217,13 @@ async function Painel() {
       <section className="cartao p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-3 text-xl font-extrabold">
-            <Selo icone={Trophy} cor="dourado" tamanho={40} /> Apuração ao vivo
+            <Selo icone={Trophy} cor="dourado" tamanho={40} /> Apuração ao vivo · {regiao.nomeCurto}
           </h2>
           <div className="flex gap-2">
-            <a href="/api/admin/exportar?tipo=ranking" className="btn btn-contorno px-4 py-2 text-sm text-verde">
+            <a href={`/api/admin/exportar?tipo=ranking&regiao=${regiao.id}`} className="btn btn-contorno px-4 py-2 text-sm text-verde">
               Baixar ranking (CSV)
             </a>
-            <a href="/api/admin/exportar?tipo=inscricoes" className="btn btn-contorno px-4 py-2 text-sm text-verde">
+            <a href={`/api/admin/exportar?tipo=inscricoes&regiao=${regiao.id}`} className="btn btn-contorno px-4 py-2 text-sm text-verde">
               Baixar inscrições (CSV)
             </a>
           </div>
@@ -236,11 +271,11 @@ async function Painel() {
   );
 }
 
-export default function PaginaAdmin() {
+export default function PaginaAdmin({ searchParams }: PageProps<"/admin">) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10">
       <Suspense fallback={<p className="text-center text-tinta-suave">Carregando…</p>}>
-        <Painel />
+        <Painel searchParams={searchParams} />
       </Suspense>
     </div>
   );

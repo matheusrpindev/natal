@@ -8,8 +8,9 @@ import { CartaoCasa, enderecoPublico, nomeCasa, type CasaPublica } from "@/compo
 import { Selo } from "@/components/Icones";
 import { MapaCasas } from "@/components/MapaCasas";
 import { cpfValido, mascararCpf } from "@/lib/cpf";
+import type { RegiaoId } from "@/lib/regioes";
 
-export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: string | null }) {
+export function Votacao({ regiao, casas, inicial }: { regiao: RegiaoId; casas: CasaPublica[]; inicial: string | null }) {
   const [escolhida, setEscolhida] = useState<CasaPublica | null>(() => casas.find((x) => x.id === inicial) ?? null);
   const [confirmado, setConfirmado] = useState<CasaPublica | null>(null);
   const [busca, setBusca] = useState("");
@@ -27,7 +28,7 @@ export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: str
           <button onClick={() => setConfirmado(null)} className="btn btn-verde">
             Votar com outro CPF
           </button>
-          <Link href="/" className="btn btn-contorno text-verde">
+          <Link href={`/${regiao}`} className="btn btn-contorno text-verde">
             Voltar ao início
           </Link>
         </div>
@@ -50,7 +51,7 @@ export function Votacao({ casas, inicial }: { casas: CasaPublica[]; inicial: str
           <p className="mb-3 text-sm text-tinta-suave">
             Monte seu roteiro: toque num número para ver a casa, votar ou abrir o caminho no celular.
           </p>
-          <MapaCasas casas={casas} votacao />
+          <MapaCasas regiao={regiao} casas={casas} votacao />
         </section>
       )}
       <div className="mx-auto mb-8 flex max-w-xl flex-col gap-2 text-center">

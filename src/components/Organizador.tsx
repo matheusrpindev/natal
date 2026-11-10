@@ -28,8 +28,9 @@ export function Organizador() {
             <img src="/marcos-logo-contorno.webp" alt={EVENTO.organizador} className="mx-auto h-28 w-auto drop-shadow-[0_4px_10px_#5a2a0a33] sm:h-32 md:mx-0" />
           </h2>
           <p className="mt-4 text-lg text-tinta-suave">
-            O Natal Iluminado nasceu para valorizar quem capricha na decoração e para unir os vizinhos do Scaffid II na
-            época mais bonita do ano. Participe, passeie pelo bairro e ajude a escolher a casa mais iluminada!
+            O Natal Iluminado nasceu para valorizar quem capricha na decoração e para unir os vizinhos do Scaffid II e do
+            Parque Residencial Marengo na época mais bonita do ano. Participe, passeie pelo bairro e ajude a escolher a
+            casa mais iluminada!
           </p>
           <a
             href={`https://www.instagram.com/${EVENTO.instagram}/`}

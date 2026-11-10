@@ -155,8 +155,35 @@ body {
 
 :focus-visible { outline: 3px solid var(--dourado); outline-offset: 2px; }
 
+/* Botão principal da página de entrada: pulsa para chamar atenção */
+@keyframes pulsar {
+  0%, 100% { box-shadow: 0 0 0 0 #f4c542aa, 0 14px 30px -10px #000c; }
+  50% { box-shadow: 0 0 0 16px #f4c54200, 0 14px 30px -10px #000c; }
+}
+.pulsar { animation: pulsar 1.8s ease-in-out infinite; }
+
+/* Painel que aparece com a escolha da região */
+@keyframes surgir {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+.surgir { animation: surgir 0.35s ease-out both; }
+
+/* Faixa diagonal "1º lugar" */
+.faixa-premio {
+  background: repeating-linear-gradient(-45deg, var(--vermelho) 0 14px, #a50c25 14px 28px);
+}
+
+/* Impressão / PDF do regulamento */
+@media print {
+  header, footer, .nao-imprimir, .leaflet-control-container { display: none !important; }
+  .cartao { box-shadow: none !important; }
+  section { break-inside: auto; }
+  h2 { break-after: avoid; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .lampada, .floco { animation: none; }
+  .lampada, .floco, .pulsar, .surgir { animation: none; }
   .neve { display: none; }
 }
 

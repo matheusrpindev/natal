@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { isFase, type Fase } from "../phase";
+import { isRegiaoId } from "../regioes";
 import type {
   Contestacao,
   FotoUpload,
@@ -31,6 +32,7 @@ interface Linha {
   protocolo: string;
   created_at: string;
   status: StatusInscricao;
+  regiao?: string | null;
   numero: number | null;
   responsavel: string;
   whatsapp: string;
@@ -54,6 +56,7 @@ function deLinha(l: Linha): Inscricao {
     protocolo: l.protocolo,
     criadoEm: l.created_at,
     status: l.status,
+    regiao: isRegiaoId(l.regiao) ? l.regiao : "scaffid-ii",
     numero: l.numero,
     responsavel: l.responsavel,
     whatsapp: l.whatsapp,
@@ -77,6 +80,7 @@ interface LinhaContestacao {
   protocolo: string;
   created_at: string;
   status: StatusContestacao;
+  regiao?: string | null;
   protocolo_inscricao: string;
   nome: string;
   whatsapp: string;
@@ -91,6 +95,7 @@ function deLinhaContestacao(l: LinhaContestacao): Contestacao {
     protocolo: l.protocolo,
     criadoEm: l.created_at,
     status: l.status,
+    regiao: isRegiaoId(l.regiao) ? l.regiao : "scaffid-ii",
     protocoloInscricao: l.protocolo_inscricao,
     nome: l.nome,
     whatsapp: l.whatsapp,
@@ -125,6 +130,7 @@ export const supabaseStore: Store = {
     }
     const linha = {
       id,
+      regiao: dados.regiao,
       protocolo: gerarProtocolo(),
       responsavel: dados.responsavel,
       whatsapp: dados.whatsapp,
@@ -141,14 +147,7 @@ export const supabaseStore: Store = {
       miniaturas: miniaturas.length === caminhos.length ? miniaturas : [],
       autoriza_localizacao: dados.autorizaLocalizacao,
     };
-    let { data, error } = await sb().from("inscricoes").insert(linha).select().single();
-    if (error && /autoriza_localizacao/.test(error.message)) {
-      // Banco ainda sem a coluna nova (supabase/schema.sql): grava sem ela, e o número/mapa ficam ocultos.
-      console.error("[inscricao] coluna autoriza_localizacao ausente; rode o supabase/schema.sql");
-      const semAutorizacao: Partial<typeof linha> = { ...linha };
-      delete semAutorizacao.autoriza_localizacao;
-      ({ data, error } = await sb().from("inscricoes").insert(semAutorizacao).select().single());
-    }
+    const { data, error } = await sb().from("inscricoes").insert(linha).select().single();
     falhou("inserir inscrição", error);
     return deLinha(data as Linha);
   },
@@ -197,6 +196,7 @@ export const supabaseStore: Store = {
       .from("contestacoes")
       .insert({
         protocolo: gerarProtocolo("CT"),
+        regiao: dados.regiao,
         protocolo_inscricao: dados.protocoloInscricao,
         nome: dados.nome,
         whatsapp: dados.whatsapp,
@@ -226,6 +226,13 @@ export const supabaseStore: Store = {
   async salvarFase(fase: Fase) {
     const { error } = await sb().from("configuracoes").upsert({ chave: "fase", valor: fase });
     falhou("salvar fase", error);
+  },
+  async verificarEsquema() {
+    const a = await sb().from("inscricoes").select("regiao,autoriza_localizacao").limit(1);
+    if (a.error) return `inscricoes: ${a.error.message}`;
+    const b = await sb().from("contestacoes").select("regiao").limit(1);
+    if (b.error) return `contestacoes: ${b.error.message}`;
+    return null;
   },
   urlFoto(caminho: string) {
     return `${process.env.SUPABASE_URL}/storage/v1/object/public/${BUCKET}/${caminho}`;

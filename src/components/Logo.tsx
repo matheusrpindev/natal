@@ -1,16 +1,12 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 
-/** Cabeçalho: logo do evento + logo do Marcos Teles (ambos com contorno branco). */
-export function Logo() {
+/** Cabeçalho: logo do evento (da região ou geral) + logo do Marcos Teles (ambos com contorno branco). */
+export function Logo({ src, alt, href }: { src: string; alt: string; href: string }) {
   return (
     <div className="flex items-center gap-3 leading-none">
-      <Link href="/" className="group" aria-label="Natal Iluminado do Scaffid II — início">
-        <img
-          src="/logo-natal-p.webp"
-          alt="Natal Iluminado Scaffid 2"
-          className="h-14 w-auto drop-shadow-[0_4px_10px_#0008] transition-transform group-hover:-rotate-2 sm:h-16"
-        />
+      <Link href={href} className="group" aria-label={`${alt} — início`}>
+        <img src={src} alt={alt} className="h-14 w-auto drop-shadow-[0_4px_10px_#0008] transition-transform group-hover:-rotate-2 sm:h-16" />
       </Link>
       <span className="h-10 w-px bg-white/25" aria-hidden />
       <img

@@ -1,6 +1,7 @@
 import { estaLogado } from "@/lib/admin";
 import { db } from "@/lib/db";
 import { ranking } from "@/lib/ranking";
+import { REGIOES, regiaoOuNula } from "@/lib/regioes";
 
 function csv(linhas: (string | number | null)[][]) {
   const esc = (v: string | number | null) => {
@@ -14,17 +15,19 @@ function csv(linhas: (string | number | null)[][]) {
 
 export async function GET(req: Request) {
   if (!(await estaLogado())) return new Response("Acesso negado", { status: 401 });
-  const tipo = new URL(req.url).searchParams.get("tipo");
+  const url = new URL(req.url);
+  const tipo = url.searchParams.get("tipo");
+  const regiao = regiaoOuNula(url.searchParams.get("regiao")) ?? REGIOES["scaffid-ii"];
   let conteudo: string;
   if (tipo === "ranking") {
-    const { lista } = await ranking();
+    const { lista } = await ranking(regiao.id);
     conteudo = csv([
       ["Posição", "Número", "Casa", "Rua", "Nº", "Votos"],
       ...lista.map((c) => [c.posicao, c.casa.numero, c.casa.titulo, c.casa.rua, c.casa.numeroCasa, c.votos]),
     ]);
   } else {
     const store = await db();
-    const lista = await store.listarInscricoes();
+    const lista = (await store.listarInscricoes()).filter((i) => i.regiao === regiao.id);
     conteudo = csv([
       ["Protocolo", "Status", "Número", "Responsável", "WhatsApp", "E-mail", "CEP", "Rua", "Nº", "Complemento", "Nome da casa", "Latitude", "Longitude", "Autoriza número e mapa", "Enviada em"],
       ...lista.map((i) => [
@@ -49,7 +52,7 @@ export async function GET(req: Request) {
   return new Response(conteudo, {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="natal-iluminado-${tipo === "ranking" ? "ranking" : "inscricoes"}.csv"`,
+      "Content-Disposition": `attachment; filename="natal-iluminado-${regiao.id}-${tipo === "ranking" ? "ranking" : "inscricoes"}.csv"`,
     },
   });
 }

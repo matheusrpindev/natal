@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Selo } from "@/components/Icones";
 import { formatarDataHora } from "@/lib/config";
 import { mascararTelefone } from "@/lib/cpf";
+import type { RegiaoId } from "@/lib/regioes";
 
 function Campo({ rotulo, dica, children }: { rotulo: string; dica?: string; children: React.ReactNode }) {
   return (
@@ -17,7 +18,7 @@ function Campo({ rotulo, dica, children }: { rotulo: string; dica?: string; chil
   );
 }
 
-export function FormContestacao({ prazo }: { prazo: string }) {
+export function FormContestacao({ regiao, prazo }: { regiao: RegiaoId; prazo: string }) {
   const [whats, setWhats] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState<string | null>(null);
@@ -53,7 +54,7 @@ export function FormContestacao({ prazo }: { prazo: string }) {
           A organização vai analisar e comunicar o resultado da análise pelo WhatsApp informado, antes da divulgação do
           resultado definitivo.
         </p>
-        <Link href="/resultado" className="btn btn-verde mt-6">
+        <Link href={`/${regiao}/resultado`} className="btn btn-verde mt-6">
           Voltar à classificação
         </Link>
       </div>

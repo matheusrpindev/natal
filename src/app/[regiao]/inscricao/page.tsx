@@ -5,11 +5,19 @@ import { Suspense } from "react";
 import { Aviso, Titulo } from "@/components/Titulo";
 import { DATAS, formatarData } from "@/lib/config";
 import { faseAtual } from "@/lib/db";
+import type { Regiao } from "@/lib/regioes";
+import { regiaoDaRota } from "@/lib/rota";
 import { FormInscricao } from "./FormInscricao";
 
 export const metadata: Metadata = { title: "Inscrição" };
 
-async function Conteudo({ searchParams }: { searchParams: Promise<{ cep?: string | string[]; numero?: string | string[] }> }) {
+async function Conteudo({
+  regiao,
+  searchParams,
+}: {
+  regiao: Regiao;
+  searchParams: Promise<{ cep?: string | string[]; numero?: string | string[] }>;
+}) {
   const { fase } = await faseAtual();
   if (fase === "em-breve") {
     return (
@@ -23,7 +31,7 @@ async function Conteudo({ searchParams }: { searchParams: Promise<{ cep?: string
     return (
       <Aviso icone={Lock} titulo="Inscrições encerradas">
         As inscrições terminaram em {formatarData(DATAS.inscricoesFim)}.{" "}
-        <Link href="/casas" className="font-bold text-verde underline">
+        <Link href={`/${regiao.id}/casas`} className="font-bold text-verde underline">
           Conheça as casas participantes
         </Link>
         .
@@ -32,19 +40,20 @@ async function Conteudo({ searchParams }: { searchParams: Promise<{ cep?: string
   }
   const sp = await searchParams;
   const um = (v?: string | string[]) => (typeof v === "string" ? v : "");
-  return <FormInscricao cepInicial={um(sp.cep)} numeroInicial={um(sp.numero)} />;
+  return <FormInscricao regiao={regiao.id} cepInicial={um(sp.cep)} numeroInicial={um(sp.numero)} />;
 }
 
-export default function PaginaInscricao({ searchParams }: PageProps<"/inscricao">) {
+export default async function PaginaInscricao({ params, searchParams }: PageProps<"/[regiao]/inscricao">) {
+  const regiao = await regiaoDaRota(params);
   return (
     <>
       <Titulo
         titulo="Inscreva sua casa"
-        subtitulo={`Inscrições de ${formatarData(DATAS.inscricoesInicio)} a ${formatarData(DATAS.inscricoesFim)}. É grátis!`}
+        subtitulo={`${regiao.concurso} · inscrições de ${formatarData(DATAS.inscricoesInicio)} a ${formatarData(DATAS.inscricoesFim)}. É grátis!`}
       />
       <div className="mx-auto max-w-3xl px-4 py-10">
         <Suspense fallback={<p className="text-center text-tinta-suave">Carregando…</p>}>
-          <Conteudo searchParams={searchParams} />
+          <Conteudo regiao={regiao} searchParams={searchParams} />
         </Suspense>
       </div>
     </>

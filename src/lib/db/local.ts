@@ -69,6 +69,7 @@ function comPadroes(i: Inscricao): Inscricao {
     latitude: i.latitude ?? null,
     longitude: i.longitude ?? null,
     autorizaLocalizacao: i.autorizaLocalizacao ?? false,
+    regiao: i.regiao ?? "scaffid-ii",
   };
 }
 
@@ -118,7 +119,9 @@ export const localStore: Store = {
       if (!ins) return;
       ins.status = status;
       if (status === "aprovada" && ins.numero == null) {
-        ins.numero = Math.max(0, ...d.inscricoes.map((i) => i.numero ?? 0)) + 1;
+        const regiao = ins.regiao ?? "scaffid-ii";
+        const mesma = d.inscricoes.filter((i) => (i.regiao ?? "scaffid-ii") === regiao);
+        ins.numero = Math.max(0, ...mesma.map((i) => i.numero ?? 0)) + 1;
       }
     });
   },
@@ -152,7 +155,7 @@ export const localStore: Store = {
     });
   },
   async listarContestacoes() {
-    return (await ler()).contestacoes ?? [];
+    return ((await ler()).contestacoes ?? []).map((c) => ({ ...c, regiao: c.regiao ?? "scaffid-ii" }));
   },
   async mudarStatusContestacao(id: string, status: StatusContestacao) {
     await mutar((d) => {
@@ -170,5 +173,8 @@ export const localStore: Store = {
   },
   urlFoto(caminho: string) {
     return `/api/fotos/${encodeURIComponent(caminho)}`;
+  },
+  async verificarEsquema() {
+    return null;
   },
 };

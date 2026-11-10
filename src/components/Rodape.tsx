@@ -1,6 +1,7 @@
 import { AtSign, TreePine } from "lucide-react";
 import Link from "next/link";
 import { EVENTO } from "@/lib/config";
+import { LISTA_REGIOES } from "@/lib/regioes";
 import { Iniciativa } from "./Iniciativa";
 
 export function Rodape() {
@@ -9,12 +10,10 @@ export function Rodape() {
       <div className="bengala h-2" />
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 py-8 text-center text-sm">
         <p className="font-festiva flex items-center gap-2 text-2xl text-dourado">
-          <TreePine size={22} aria-hidden /> Feliz Natal, Scaffid II!
+          <TreePine size={22} aria-hidden /> Feliz Natal!
         </p>
         <Iniciativa tamanho="h-14 sm:h-16" />
-        <p>
-          {EVENTO.nome} {EVENTO.ano}
-        </p>
+        <p>Natal Iluminado {EVENTO.ano} · Scaffid II e Parque Residencial Marengo</p>
         <a
           href={`https://www.instagram.com/${EVENTO.instagram}/`}
           target="_blank"
@@ -24,9 +23,14 @@ export function Rodape() {
           <AtSign size={16} aria-hidden /> {EVENTO.instagram}
         </a>
         <p className="flex flex-wrap justify-center gap-x-4 gap-y-1">
-          <Link href="/regulamento" className="underline-offset-4 hover:underline">
-            Regulamento
+          <Link href="/" className="underline-offset-4 hover:underline">
+            Início
           </Link>
+          {LISTA_REGIOES.map((r) => (
+            <Link key={r.id} href={`/${r.id}`} className="underline-offset-4 hover:underline">
+              {r.nomeCurto}
+            </Link>
+          ))}
           <Link href="/privacidade" className="underline-offset-4 hover:underline">
             Privacidade
           </Link>

@@ -8,6 +8,7 @@ import { Selo } from "@/components/Icones";
 import { MapaLocalizacao, type Ponto } from "@/components/MapaLocalizacao";
 import { mascararCep, soDigitosCep, verificarCep, type ResultadoParticipacao } from "@/lib/cep";
 import { mascararTelefone } from "@/lib/cpf";
+import { REGIOES, type RegiaoId } from "@/lib/regioes";
 import type { Rua } from "@/lib/ruas";
 import { EVENTO } from "@/lib/config";
 import { prepararFoto } from "@/lib/reduzirImagem";
@@ -29,6 +30,18 @@ function Campo({ rotulo, dica, children }: { rotulo: string; dica?: string; chil
 }
 
 function AvisoCep({ r }: { r: ResultadoParticipacao }) {
+  if (r.status === "outra-regiao") {
+    const outra = REGIOES[r.regiao];
+    return (
+      <span className="flex items-center gap-1.5 text-sm font-bold text-vermelho">
+        <CircleX size={16} aria-hidden /> Esse CEP é do {outra.nome}.{" "}
+        <Link href={`/${outra.id}/inscricao`} className="underline">
+          Inscreva-se no concurso de lá
+        </Link>
+        .
+      </span>
+    );
+  }
   if (r.status === "sim")
     return (
       <span className="flex items-center gap-1.5 text-sm font-bold text-verde">
@@ -54,7 +67,15 @@ function AvisoCep({ r }: { r: ResultadoParticipacao }) {
   );
 }
 
-export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInicial?: string; numeroInicial?: string }) {
+export function FormInscricao({
+  regiao,
+  cepInicial = "",
+  numeroInicial = "",
+}: {
+  regiao: RegiaoId;
+  cepInicial?: string;
+  numeroInicial?: string;
+}) {
   const [fotos, setFotos] = useState<Foto[]>([]);
   const [whats, setWhats] = useState("");
   const [local, setLocal] = useState<Ponto | null>(null);
@@ -70,7 +91,7 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
     if (digitosCep.length !== 8) return;
     let ativo = true;
     queueMicrotask(() => ativo && setConsultaCep({ cep: digitosCep, resultado: null, buscando: true }));
-    verificarCep(digitosCep)
+    verificarCep(regiao, digitosCep)
       .then((resultado) => {
         if (!ativo) return;
         setConsultaCep({ cep: digitosCep, resultado, buscando: false });
@@ -88,7 +109,7 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
     return () => {
       ativo = false;
     };
-  }, [digitosCep]);
+  }, [digitosCep, regiao]);
   const consultaAtual = consultaCep?.cep === digitosCep ? consultaCep : null;
   const [processando, setProcessando] = useState(false);
   const [enviando, setEnviando] = useState(false);
@@ -157,7 +178,7 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
           entra na votação. Qualquer dúvida, entraremos em contato pelo WhatsApp informado. Guarde este protocolo: ele
           identifica a sua inscrição, por exemplo, se precisar apresentar uma contestação.
         </p>
-        <Link href="/" className="btn btn-verde mt-6">
+        <Link href={`/${regiao}`} className="btn btn-verde mt-6">
           Voltar ao início
         </Link>
       </div>
@@ -256,7 +277,7 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
           Só participam as casas dentro do contorno vermelho. Ao digitar o CEP, o mapa vai até a sua rua (em amarelo). Toque em
           cima do telhado da sua casa.
         </p>
-        <MapaLocalizacao valor={local} aoMudar={setLocal} foco={ruaFoco} />
+        <MapaLocalizacao regiao={regiao} valor={local} aoMudar={setLocal} foco={ruaFoco} />
         <input type="hidden" name="latitude" value={local?.lat ?? ""} />
         <input type="hidden" name="longitude" value={local?.lng ?? ""} />
       </fieldset>
@@ -318,6 +339,7 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
       </fieldset>
 
       {/* Campo-armadilha contra robôs: fica invisível para pessoas */}
+      <input type="hidden" name="regiao" value={regiao} />
       <input type="text" name="site" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden />
 
       <label className="flex items-start gap-3 rounded-xl border border-borda p-4">
@@ -333,7 +355,7 @@ export function FormInscricao({ cepInicial = "", numeroInicial = "" }: { cepInic
         <input type="checkbox" name="aceite" required className="mt-1 h-5 w-5 accent-verde" />
         <span className="text-sm">
           Li e aceito o{" "}
-          <Link href="/regulamento" target="_blank" className="font-bold text-verde underline">
+          <Link href={`/${regiao}/regulamento`} target="_blank" className="font-bold text-verde underline">
             regulamento
           </Link>
           . Declaro que tenho 18 anos ou mais, que moro nesta casa ou tenho autorização do responsável, e que as fotos

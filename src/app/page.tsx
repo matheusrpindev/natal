@@ -1,125 +1,111 @@
-import { ArrowRight, ClipboardPen, Lightbulb, Trophy, Vote } from "lucide-react";
+/* eslint-disable @next/next/no-img-element */
+import { ClipboardPen, Download, FileText, Trophy, Vote } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Contagem } from "@/components/Contagem";
-import { Enfeite, Selo } from "@/components/Icones";
-import { Neve } from "@/components/Neve";
+import { EscolhaRegiao, type Acao } from "@/components/EscolhaRegiao";
+import { Selo } from "@/components/Icones";
 import { Iniciativa } from "@/components/Iniciativa";
+import { Luzes } from "@/components/Luzes";
+import { Neve } from "@/components/Neve";
 import { Organizador } from "@/components/Organizador";
-import { PodeParticipar } from "@/components/PodeParticipar";
+import { FotoPremio } from "@/components/Premio";
 import { DATAS, EVENTO, formatarData } from "@/lib/config";
 import { faseAtual } from "@/lib/db";
 import { proximoMarco, type Fase } from "@/lib/phase";
+import { LISTA_REGIOES } from "@/lib/regioes";
+import { urlPdf } from "./[regiao]/regulamento/componentes";
+
+export const metadata: Metadata = { title: { absolute: "Natal Iluminado 2026 · Concorra a um kit churrasco" } };
+
+const ACOES: Record<Fase, Acao> = {
+  "em-breve": { rotulo: "Inscreva minha casa", caminho: "/inscricao", pergunta: "Onde fica a sua casa?" },
+  inscricoes: { rotulo: "Inscreva minha casa", caminho: "/inscricao", pergunta: "Onde fica a sua casa?" },
+  votacao: { rotulo: "Votar agora", caminho: "/votar", pergunta: "Em qual bairro você quer votar?" },
+  apuracao: { rotulo: "Ver as casas", caminho: "/casas", pergunta: "De qual bairro?" },
+  preliminar: { rotulo: "Ver a classificação", caminho: "/resultado", pergunta: "De qual bairro?" },
+  resultado: { rotulo: "Ver o resultado", caminho: "/resultado", pergunta: "De qual bairro?" },
+};
 
 const ETAPAS = [
   {
     icone: ClipboardPen,
     cor: "vermelho" as const,
-    titulo: "Inscrições",
+    titulo: "Inscreva sua casa",
     quando: `${formatarData(DATAS.inscricoesInicio)} a ${formatarData(DATAS.inscricoesFim)}`,
-    texto: "Monte sua decoração, tire fotos caprichadas e inscreva sua casa aqui no site.",
+    texto: "Decore, tire de 1 a 3 fotos e inscreva sua casa pelo site. É grátis!",
   },
   {
     icone: Vote,
     cor: "verde" as const,
-    titulo: "Votação",
+    titulo: "Votação popular",
     quando: `${formatarData(DATAS.votacaoInicio)} a ${formatarData(DATAS.votacaoFim)}`,
-    texto: "Qualquer pessoa pode votar: é um voto por CPF. Passeie pelo bairro e escolha a sua favorita!",
+    texto: "Qualquer pessoa vota, com 1 voto por CPF. Chame a família e os vizinhos!",
   },
   {
     icone: Trophy,
     cor: "dourado" as const,
     titulo: "Resultado",
     quando: formatarData(DATAS.resultado),
-    texto: `Classificação preliminar em ${formatarData(DATAS.preliminar)} e resultado definitivo em ${formatarData(DATAS.resultado)}. Só o 1º lugar é premiado.`,
+    texto: "A casa mais votada de cada bairro ganha um kit churrasco.",
   },
 ];
 
-const CHAMADA: Record<Fase, { texto: string; href: string; rotulo: string } | null> = {
-  "em-breve": { texto: "As inscrições começam em breve. Já vá preparando as luzes!", href: "/regulamento", rotulo: "Ler o regulamento" },
-  inscricoes: { texto: "Inscrições abertas! Mostre a decoração da sua casa.", href: "/inscricao", rotulo: "Inscrever minha casa" },
-  votacao: { texto: "A votação está aberta! Escolha a casa mais bonita.", href: "/votar", rotulo: "Votar agora" },
-  apuracao: { texto: "Votação encerrada! Estamos apurando os votos.", href: "/casas", rotulo: "Ver as casas" },
-  preliminar: {
-    texto: "Saiu a classificação preliminar! O resultado definitivo sai depois do prazo de contestação.",
-    href: "/resultado",
-    rotulo: "Ver a classificação",
-  },
-  resultado: { texto: "Saiu o resultado do Natal Iluminado!", href: "/resultado", rotulo: "Ver o resultado" },
-};
-
-async function Destaque() {
+async function Chamada() {
   const { fase } = await faseAtual();
   const marco = proximoMarco(fase);
-  const chamada = CHAMADA[fase];
   return (
-    <div className="flex flex-col items-center gap-7">
+    <div className="flex w-full flex-col items-center gap-8">
+      <EscolhaRegiao acao={ACOES[fase]} />
       {marco && <Contagem alvo={marco.data.toISOString()} rotulo={marco.rotulo} />}
-      {chamada && (
-        <div className="flex flex-col items-center gap-4">
-          <p className="text-lg font-bold text-white">{chamada.texto}</p>
-          <Link href={chamada.href} className="btn btn-dourado text-lg">
-            {chamada.rotulo} <ArrowRight size={20} aria-hidden />
-          </Link>
-        </div>
-      )}
     </div>
   );
 }
 
-async function SecaoPodeParticipar() {
-  const { fase } = await faseAtual();
-  if (fase !== "em-breve" && fase !== "inscricoes") return null;
+export default function Entrada() {
   return (
-    <section id="pode-participar" className="mx-auto max-w-4xl scroll-mt-6 px-4 pb-14">
-      <div className="mb-6 text-center">
-        <h2 className="font-festiva text-4xl font-bold text-vermelho sm:text-5xl">Minha casa pode participar?</h2>
-        <p className="mt-2 text-tinta-suave">
-          Digite o CEP e o número da sua casa para saber se ela está na área do concurso.{" "}
-          <Link href="/regulamento#area" className="font-bold text-verde underline">
-            Ver todas as ruas participantes
-          </Link>
-        </p>
-      </div>
-      <PodeParticipar inscricoesAbertas={fase === "inscricoes"} dataInscricoes={formatarData(DATAS.inscricoesInicio)} />
-    </section>
-  );
-}
-
-export default function Inicio() {
-  return (
-    <>
+    <main className="flex-1">
       <section className="ceu-noturno relative overflow-hidden text-white">
+        <Luzes />
         <Neve />
-        <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 pt-12 pb-16 text-center sm:pt-16 sm:pb-24">
+        <div className="relative mx-auto flex max-w-5xl flex-col items-center px-4 pt-6 pb-16 text-center sm:pb-24">
           <p className="rounded-full border border-dourado/40 bg-dourado/10 px-4 py-1.5 text-xs font-extrabold tracking-[0.12em] text-dourado uppercase sm:tracking-[0.2em]">
             Concurso de decoração de Natal {EVENTO.ano}
           </p>
-          <h1 className="mt-6">
-            <span className="sr-only">Natal Iluminado do Scaffid II</span>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/logo-natal.webp"
-              alt=""
-              className="mx-auto h-56 w-auto drop-shadow-[0_10px_30px_#000a] sm:h-72 md:h-80"
-            />
+          <h1 className="mt-5">
+            <span className="sr-only">Natal Iluminado 2026 — Scaffid II e Parque Residencial Marengo</span>
+            <img src="/logo-natal-geral.webp" alt="" className="mx-auto h-44 w-auto drop-shadow-[0_10px_30px_#000a] sm:h-60" />
           </h1>
-          <p className="mt-5 max-w-2xl text-lg text-white/85 sm:text-xl">
-            Vamos encher o bairro de luz! Decore sua casa, inscreva-se e concorra ao título de{" "}
-            <strong className="text-dourado">casa mais bonita do Natal</strong>.
+          <p className="mt-4 text-lg font-extrabold text-white sm:text-xl">
+            No <span className="text-dourado">Scaffid II</span> e no <span className="text-dourado">Parque Residencial Marengo</span>
           </p>
-          <Iniciativa className="mt-6" />
-          <div className="mt-10 min-h-48">
-            <Suspense fallback={null}>
-              <Destaque />
+
+          <div className="mt-8 grid w-full items-center gap-8 md:grid-cols-[1.1fr_1fr] md:text-left">
+            <div>
+              <p className="faixa-premio inline-block -rotate-2 rounded-lg px-4 py-1.5 text-sm font-black tracking-[0.2em] text-white uppercase shadow-lg">
+                Prêmio do 1º lugar
+              </p>
+              <h2 className="font-festiva mt-3 text-5xl leading-[0.95] font-bold text-dourado drop-shadow-[0_4px_0_#7a1020] sm:text-7xl">
+                Ganhe um kit churrasco!
+              </h2>
+              <p className="mt-4 max-w-md text-lg text-white/90 md:max-w-none">
+                A casa com a decoração mais votada <strong className="text-white">em cada bairro</strong> leva o kit para
+                comemorar com a família.
+              </p>
+            </div>
+            <FotoPremio className="md:rotate-2" />
+          </div>
+
+          <div className="mt-12 w-full">
+            <Suspense fallback={<EscolhaRegiao acao={ACOES["inscricoes"]} />}>
+              <Chamada />
             </Suspense>
           </div>
+          <Iniciativa className="mt-10" />
         </div>
         <svg viewBox="0 0 1440 80" className="relative block w-full text-creme" preserveAspectRatio="none" aria-hidden>
-          <path
-            fill="currentColor"
-            d="M0 40 C 120 10, 240 70, 360 40 S 600 10, 720 40 960 70, 1080 40 1320 10, 1440 40 V80 H0 Z"
-          />
+          <path fill="currentColor" d="M0 40 C 120 10, 240 70, 360 40 S 600 10, 720 40 960 70, 1080 40 1320 10, 1440 40 V80 H0 Z" />
         </svg>
       </section>
 
@@ -140,55 +126,38 @@ export default function Inicio() {
         </ol>
       </section>
 
-      <Suspense fallback={null}>
-        <SecaoPodeParticipar />
-      </Suspense>
+      <section className="mx-auto max-w-6xl px-4 pb-14">
+        <h2 className="font-festiva text-center text-4xl font-bold text-vermelho sm:text-5xl">Dois bairros, dois campeões</h2>
+        <p className="mx-auto mt-2 max-w-2xl text-center text-tinta-suave">
+          Cada bairro tem o seu concurso, com inscrições, votação e vencedor próprios. O prêmio é o mesmo.
+        </p>
+        <div className="mt-8 grid gap-6 md:grid-cols-2">
+          {LISTA_REGIOES.map((r) => (
+            <article key={r.id} className="cartao flex flex-col items-center gap-4 p-6 text-center">
+              <div className="w-full rounded-2xl bg-verde-noite p-4">
+                <img src={r.logo.pequeno} alt={r.concurso} className="mx-auto h-28 w-auto" />
+              </div>
+              <h3 className="text-2xl font-extrabold">{r.nome}</h3>
+              <p className="text-tinta-suave">
+                {r.ruas.length} ruas participantes · casas dentro do contorno do mapa
+              </p>
+              <div className="flex flex-wrap justify-center gap-2">
+                <Link href={`/${r.id}`} className="btn btn-verde">
+                  Entrar
+                </Link>
+                <Link href={`/${r.id}/regulamento`} className="btn btn-contorno text-verde">
+                  <FileText size={18} aria-hidden /> Regulamento
+                </Link>
+                <a href={urlPdf(r)} download className="btn btn-contorno text-verde">
+                  <Download size={18} aria-hidden /> PDF
+                </a>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <Organizador />
-
-      <section className="bg-verde text-white">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 md:grid-cols-[1fr_auto]">
-          <div>
-            <h2 className="font-festiva text-4xl font-bold text-dourado sm:text-5xl">Prêmio</h2>
-            <p className="mt-3 max-w-2xl text-lg text-white/90">
-              Uma única casa vencedora: <strong className="text-white">só o 1º lugar é premiado</strong>.{" "}
-              {EVENTO.premio
-                ? `O prêmio: ${EVENTO.premio}.`
-                : "O prêmio será anunciado em breve aqui no site."}
-            </p>
-          </div>
-          <div className="flex justify-center" aria-hidden>
-            <Enfeite posicao={1} tamanho={104} />
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-6xl px-4 py-14">
-        <div className="grid gap-6 md:grid-cols-2">
-          <div className="cartao p-6">
-            <h3 className="flex items-center gap-3 text-xl font-extrabold">
-              <Selo icone={Lightbulb} cor="dourado" tamanho={40} /> Dicas para a sua decoração
-            </h3>
-            <ul className="mt-3 list-disc space-y-1.5 pl-5 text-tinta-suave">
-              <li>A decoração precisa estar visível da rua.</li>
-              <li>Tire fotos à noite, com as luzes acesas, e uma de dia para mostrar os detalhes.</li>
-              <li>Mantenha as luzes ligadas durante o período de votação para o pessoal visitar.</li>
-              <li>Vale reaproveitar materiais e soltar a criatividade!</li>
-            </ul>
-          </div>
-          <div className="cartao p-6">
-            <h3 className="flex items-center gap-3 text-xl font-extrabold">
-              <Selo icone={Vote} cor="verde" tamanho={40} /> Sobre a votação
-            </h3>
-            <ul className="mt-3 list-disc space-y-1.5 pl-5 text-tinta-suave">
-              <li>Qualquer pessoa pode votar, morando ou não no bairro.</li>
-              <li>Cada CPF vale um voto. Não é possível trocar o voto depois.</li>
-              <li>Seu CPF fica guardado de forma criptografada e serve só para evitar votos repetidos.</li>
-              <li>O resultado será divulgado no dia {formatarData(DATAS.resultado)}.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-    </>
+    </main>
   );
 }

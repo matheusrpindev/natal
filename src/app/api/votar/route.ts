@@ -1,7 +1,11 @@
 import { headers } from "next/headers";
 import { cpfValido, soDigitos } from "@/lib/cpf";
 import { db, faseAtual } from "@/lib/db";
+import type { RegiaoId } from "@/lib/regioes";
 import { hmac } from "@/lib/secrets";
+
+/** Um voto por CPF em cada região: o hash do CPF leva a região junto (o Scaffid II mantém o formato original). */
+const contextoCpf = (regiao: RegiaoId) => (regiao === "scaffid-ii" ? "cpf" : `cpf:${regiao}`);
 
 function erro(msg: string, status = 400) {
   return Response.json({ erro: msg }, { status });
@@ -30,11 +34,11 @@ export async function POST(req: Request) {
   const ip = h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || null;
   const resultado = await store.registrarVoto({
     inscricaoId: casa.id,
-    cpfHash: hmac(cpf, "cpf"),
+    cpfHash: hmac(cpf, contextoCpf(casa.regiao)),
     nome,
     ipHash: ip ? hmac(ip, "ip") : null,
     userAgent: h.get("user-agent")?.slice(0, 300) ?? null,
   });
-  if (resultado === "cpf-ja-votou") return erro("Este CPF já votou. Cada CPF pode votar apenas uma vez.", 409);
+  if (resultado === "cpf-ja-votou") return erro("Este CPF já votou neste concurso. Cada CPF pode votar apenas uma vez.", 409);
   return Response.json({ ok: true });
 }

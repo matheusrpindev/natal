@@ -3,8 +3,8 @@
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
 import { useEffect, useState, type RefObject } from "react";
-import { AREA } from "./area";
-import { RUAS, type Rua } from "./ruas";
+import { REGIOES, type RegiaoId } from "./regioes";
+import type { Rua } from "./ruas";
 
 export type L = typeof Leaflet;
 
@@ -25,6 +25,7 @@ export interface MapaMontado {
 export async function montarMapa(
   el: HTMLElement,
   cancelado: () => boolean,
+  regiao: RegiaoId,
   opcoes: { travarArea?: boolean; aoAvisar?: (msg: string) => void } = {},
 ): Promise<MapaMontado | null> {
   const L = (await import("leaflet")).default;
@@ -67,6 +68,7 @@ export async function montarMapa(
     [89, 179],
     [89, -179],
   ];
+  const AREA = REGIOES[regiao].area;
   L.polygon([mundo, AREA], { stroke: false, fillColor: "#061f15", fillOpacity: 0.6, interactive: false }).addTo(mapa);
   const contorno = L.polygon(AREA, { color: "#ff3b3b", weight: 3, fill: false, interactive: false }).addTo(mapa);
   mapa.fitBounds(contorno.getBounds(), { padding: [12, 12] });
@@ -85,8 +87,8 @@ export function destacarRua(L: L, mapa: Leaflet.Map, rua: Rua) {
 }
 
 /** Desenha todas as ruas participantes, com o nome ao passar o dedo/mouse. */
-export function desenharRuas(L: L, mapa: Leaflet.Map) {
-  return RUAS.map((r) =>
+export function desenharRuas(L: L, mapa: Leaflet.Map, regiao: RegiaoId) {
+  return REGIOES[regiao].ruas.map((r) =>
     L.polyline(r.tracado, {
       color: r.situacao === "inteira" ? "#f4c542" : "#ffb38a",
       weight: 5,
@@ -102,7 +104,11 @@ export function desenharRuas(L: L, mapa: Leaflet.Map) {
  * Monta o mapa num elemento e chama `configurar` quando ele estiver pronto.
  * Devolve uma mensagem de erro/aviso para mostrar por cima do mapa, se algo der errado.
  */
-export function useMapa(caixa: RefObject<HTMLDivElement | null>, configurar: (m: MapaMontado) => void | (() => void)) {
+export function useMapa(
+  caixa: RefObject<HTMLDivElement | null>,
+  regiao: RegiaoId,
+  configurar: (m: MapaMontado) => void | (() => void),
+) {
   const [aviso, setAviso] = useState<string | null>(null);
   useEffect(() => {
     let cancelado = false;
@@ -111,7 +117,7 @@ export function useMapa(caixa: RefObject<HTMLDivElement | null>, configurar: (m:
     (async () => {
       if (!caixa.current) return;
       try {
-        montado = await montarMapa(caixa.current, () => cancelado, { aoAvisar: (m) => !cancelado && setAviso(m) });
+        montado = await montarMapa(caixa.current, () => cancelado, regiao, { aoAvisar: (m) => !cancelado && setAviso(m) });
         if (!montado) return;
         if (cancelado) {
           montado.mapa.remove();

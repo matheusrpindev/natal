@@ -4,9 +4,18 @@ import { CircleCheck, CircleHelp, CircleX, LoaderCircle, Search } from "lucide-r
 import Link from "next/link";
 import { useState } from "react";
 import { mascararCep, soDigitosCep, verificarCep, type ResultadoParticipacao } from "@/lib/cep";
+import { REGIOES, type RegiaoId } from "@/lib/regioes";
 import { MapaArea } from "./MapaArea";
 
-export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscricoesAbertas: boolean; dataInscricoes: string }) {
+export function PodeParticipar({
+  regiao,
+  inscricoesAbertas,
+  dataInscricoes,
+}: {
+  regiao: RegiaoId;
+  inscricoesAbertas: boolean;
+  dataInscricoes: string;
+}) {
   const [cep, setCep] = useState("");
   const [numero, setNumero] = useState("");
   const [buscando, setBuscando] = useState(false);
@@ -23,7 +32,7 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
     }
     setBuscando(true);
     try {
-      setResultado(await verificarCep(cep));
+      setResultado(await verificarCep(regiao, cep));
     } catch (e) {
       setErro((e as Error).message);
     } finally {
@@ -31,7 +40,7 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
     }
   }
 
-  const linkInscricao = `/inscricao?cep=${soDigitosCep(cep)}${numero ? `&numero=${encodeURIComponent(numero)}` : ""}`;
+  const linkInscricao = `/${regiao}/inscricao?cep=${soDigitosCep(cep)}${numero ? `&numero=${encodeURIComponent(numero)}` : ""}`;
   const chamada = inscricoesAbertas ? (
     <Link href={linkInscricao} className="btn btn-vermelho mt-4">
       Inscrever minha casa
@@ -50,7 +59,7 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
             value={cep}
             onChange={(e) => setCep(mascararCep(e.target.value))}
             inputMode="numeric"
-            placeholder="08587-000"
+            placeholder={REGIOES[regiao].cepExemplo}
             className="campo"
             autoComplete="postal-code"
             required
@@ -93,7 +102,7 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
               </p>
               {chamada}
             </div>
-            <MapaArea destaque={resultado.rua} mostrarRuas={false} altura="h-72 sm:h-96" />
+            <MapaArea regiao={regiao} destaque={resultado.rua} mostrarRuas={false} altura="h-72 sm:h-96" />
           </div>
         )}
 
@@ -109,7 +118,7 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
                     <strong>{endereco(resultado.endereco.logradouro || "Esse endereço")}</strong>
                     {resultado.endereco.bairro && ` (${resultado.endereco.bairro})`}
                     {resultado.status === "bairro-fora"
-                      ? " é do Scaffid II, mas não está entre as ruas desta edição. Veja a área no mapa:"
+                      ? ` é do ${REGIOES[regiao].nome}, mas não está entre as ruas desta edição. Veja a área no mapa:`
                       : " não está na área do concurso. Veja no mapa as ruas que participam:"}
                   </>
                 ) : (
@@ -120,7 +129,43 @@ export function PodeParticipar({ inscricoesAbertas, dataInscricoes }: { inscrico
                 Acha que é engano? Fale com a organização. Mas você ainda pode votar nas casas participantes!
               </p>
             </div>
-            <MapaArea altura="h-72 sm:h-96" />
+            <MapaArea regiao={regiao} altura="h-72 sm:h-96" />
+          </div>
+        )}
+
+        {resultado?.status === "conferir" && (
+          <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-dourado/20 p-5">
+            <div>
+              <p className="flex items-center gap-2 text-xl font-extrabold text-dourado-escuro">
+                <CircleHelp aria-hidden /> Confira no mapa.
+              </p>
+              <p className="mt-1">
+                Não achamos a <strong>{endereco(resultado.endereco.logradouro || "sua rua")}</strong> na nossa lista, mas ela é
+                do {resultado.endereco.bairro}. Se a sua casa estiver dentro do contorno vermelho, pode participar.
+              </p>
+              {chamada}
+            </div>
+            <MapaArea regiao={regiao} altura="h-72 sm:h-96" />
+          </div>
+        )}
+
+        {resultado?.status === "outra-regiao" && (
+          <div className="mt-6 rounded-2xl bg-verde/10 p-5">
+            <p className="flex items-center gap-2 text-xl font-extrabold text-verde">
+              <CircleCheck aria-hidden /> Esse CEP é do {REGIOES[resultado.regiao].nome}!
+            </p>
+            <p className="mt-1">
+              {resultado.rua ? (
+                <>
+                  A <strong>{endereco(resultado.rua.nome)}</strong> participa do concurso do {REGIOES[resultado.regiao].nomeCurto}.
+                </>
+              ) : (
+                <>Essa casa participa do concurso do {REGIOES[resultado.regiao].nomeCurto}, se estiver dentro do contorno de lá.</>
+              )}
+            </p>
+            <Link href={`/${resultado.regiao}#pode-participar`} className="btn btn-verde mt-4">
+              Ir para o {REGIOES[resultado.regiao].nomeCurto}
+            </Link>
           </div>
         )}
 

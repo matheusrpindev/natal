@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { dentroDaArea } from "@/lib/area";
 import { destacarRua, useMapa, type L as Leaflet } from "@/lib/mapaBase";
 import { AvisoMapa } from "./AvisoMapa";
+import { REGIOES, type RegiaoId } from "@/lib/regioes";
 import type { Rua } from "@/lib/ruas";
 
 export interface Ponto {
@@ -19,10 +20,12 @@ const PINO = `<svg width="34" height="44" viewBox="0 0 34 44" xmlns="http://www.
 
 /** Mapa para a pessoa marcar onde fica a casa, só dentro da área do concurso. */
 export function MapaLocalizacao({
+  regiao,
   valor,
   aoMudar,
   foco,
 }: {
+  regiao: RegiaoId;
   valor: Ponto | null;
   aoMudar: (p: Ponto | null) => void;
   /** Rua do CEP digitado: o mapa aproxima e destaca. */
@@ -44,13 +47,13 @@ export function MapaLocalizacao({
     aoMudarRef.current = aoMudar;
   }, [aoMudar]);
 
-  const avisoMapa = useMapa(caixa, ({ L, mapa: m }) => {
+  const avisoMapa = useMapa(caixa, regiao, ({ L, mapa: m }) => {
     mapa.current = m;
     lib.current = L;
     const icone = L.divIcon({ html: PINO, className: "", iconSize: [34, 44], iconAnchor: [17, 43] });
 
     const marcar = (lat: number, lng: number, centralizar = false) => {
-      if (!dentroDaArea(lat, lng)) {
+      if (!dentroDaArea(REGIOES[regiao].area, lat, lng)) {
         setAviso("Esse ponto está fora da área do concurso. Marque uma casa dentro do contorno vermelho.");
         return false;
       }

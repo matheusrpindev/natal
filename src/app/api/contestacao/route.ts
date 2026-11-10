@@ -37,10 +37,12 @@ export async function POST(req: Request) {
 
   const store = await db();
   const inscricoes = await store.listarInscricoes();
-  if (!inscricoes.some((i) => i.protocolo === protocoloInscricao)) {
+  const inscricao = inscricoes.find((i) => i.protocolo === protocoloInscricao);
+  if (!inscricao) {
     return erro("Não encontramos esse protocolo de inscrição. Ele está na mensagem de confirmação da inscrição (ex.: NI-ABC123).");
   }
   const c = await store.criarContestacao({
+    regiao: inscricao.regiao,
     protocoloInscricao,
     nome,
     whatsapp,

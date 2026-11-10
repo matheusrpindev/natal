@@ -2,6 +2,7 @@ import "server-only";
 import type { CasaPublica } from "@/components/CartaoCasa";
 import { casasAprovadas } from "./casas";
 import { db } from "./db";
+import type { RegiaoId } from "./regioes";
 
 export interface Colocacao {
   posicao: number;
@@ -9,10 +10,10 @@ export interface Colocacao {
   casa: CasaPublica;
 }
 
-/** Ranking por votos. Empates dividem a mesma posição. */
-export async function ranking(): Promise<{ lista: Colocacao[]; total: number }> {
+/** Ranking por votos da região. Empates dividem a mesma posição. */
+export async function ranking(regiao: RegiaoId): Promise<{ lista: Colocacao[]; total: number }> {
   const store = await db();
-  const [casas, contagem] = await Promise.all([casasAprovadas(), store.contarVotos()]);
+  const [casas, contagem] = await Promise.all([casasAprovadas(regiao), store.contarVotos()]);
   const ordenadas = casas
     .map((casa) => ({ casa, votos: contagem[casa.id] ?? 0 }))
     .sort((a, b) => b.votos - a.votos || (a.casa.numero ?? 0) - (b.casa.numero ?? 0));

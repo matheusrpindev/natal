@@ -1,4 +1,5 @@
 import { dentroDaArea } from "@/lib/area";
+import { regiaoOuNula } from "@/lib/regioes";
 import { EVENTO } from "@/lib/config";
 import { soDigitos } from "@/lib/cpf";
 import { db, faseAtual } from "@/lib/db";
@@ -29,6 +30,8 @@ export async function POST(req: Request) {
   }
   if (texto(f, "site", 100)) return Response.json({ protocolo: "NI-OK" }); // robô
 
+  const regiao = regiaoOuNula(texto(f, "regiao", 30));
+  if (!regiao) return erro("Região inválida. Volte e escolha Scaffid II ou Marengo.");
   const responsavel = texto(f, "responsavel", 120);
   const whatsapp = texto(f, "whatsapp", 20);
   const rua = texto(f, "rua", 120);
@@ -47,7 +50,9 @@ export async function POST(req: Request) {
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude) || (latitude === 0 && longitude === 0)) {
     return erro("Marque no mapa onde fica a sua casa.");
   }
-  if (!dentroDaArea(latitude, longitude)) return erro("A casa marcada está fora da área do concurso.");
+  if (!dentroDaArea(regiao.area, latitude, longitude)) {
+    return erro(`A casa marcada está fora da área do concurso do ${regiao.nome}.`);
+  }
 
   const arquivos = f.getAll("fotos").filter((x): x is File => x instanceof File && x.size > 0);
   if (arquivos.length === 0) return erro("Envie pelo menos uma foto.");
@@ -71,6 +76,7 @@ export async function POST(req: Request) {
   const store = await db();
   const nova = await store.criarInscricao(
     {
+      regiao: regiao.id,
       responsavel,
       whatsapp: tel,
       email: email || null,

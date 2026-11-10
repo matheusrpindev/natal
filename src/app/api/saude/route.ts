@@ -10,7 +10,14 @@ export async function GET() {
   try {
     const store = await db();
     await store.lerFase();
-    return Response.json({ ok: true, banco: usandoSupabase ? "supabase" : "local (teste)", em: new Date().toISOString() });
+    const esquema = await store.verificarEsquema();
+    return Response.json({
+      ok: true,
+      banco: usandoSupabase ? "supabase" : "local (teste)",
+      // "atualizado" ou o que falta (rode supabase/schema.sql no Supabase)
+      esquema: esquema ? "desatualizado" : "atualizado",
+      em: new Date().toISOString(),
+    });
   } catch (e) {
     console.error("[saude]", e);
     return Response.json({ ok: false, banco: usandoSupabase ? "supabase" : "local (teste)" }, { status: 503 });

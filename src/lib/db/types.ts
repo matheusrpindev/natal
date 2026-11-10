@@ -1,4 +1,5 @@
 import type { Fase } from "../phase";
+import type { RegiaoId } from "../regioes";
 
 export type StatusInscricao = "pendente" | "aprovada" | "recusada";
 
@@ -7,7 +8,9 @@ export interface Inscricao {
   protocolo: string;
   criadoEm: string;
   status: StatusInscricao;
-  /** Número público da casa no concurso; definido ao aprovar. */
+  /** Região (concurso) da casa. */
+  regiao: RegiaoId;
+  /** Número público da casa no concurso da região; definido ao aprovar. */
   numero: number | null;
   responsavel: string;
   whatsapp: string;
@@ -57,6 +60,7 @@ export interface Contestacao {
   protocolo: string;
   criadoEm: string;
   status: StatusContestacao;
+  regiao: RegiaoId;
   /** Protocolo da inscrição de quem contesta. */
   protocoloInscricao: string;
   nome: string;
@@ -83,4 +87,6 @@ export interface Store {
   lerFase(): Promise<Fase | null>;
   salvarFase(fase: Fase): Promise<void>;
   urlFoto(caminho: string): string;
+  /** Confere se o banco tem as colunas e tabelas que esta versão do site usa. */
+  verificarEsquema(): Promise<string | null>;
 }

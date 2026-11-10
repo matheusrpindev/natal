@@ -2,19 +2,29 @@
 
 Site do concurso de decoração de Natal do Scaffid II, uma iniciativa de **Marcos Teles** (Marcos Diego Teles Monteiro, Instagram @omarcosteles).
 
+Agora são **dois concursos** com o mesmo calendário e o mesmo prêmio (kit churrasco para o 1º lugar de cada bairro):
+**Scaffid II** (`/scaffid-ii`) e **Parque Residencial Marengo** (`/marengo`). Cada um tem área, ruas, inscrições,
+numeração das casas, votação (1 voto por CPF em cada bairro), contestações e vencedor próprios. Os endereços antigos
+(`/inscricao`, `/votar`...) levam ao Scaffid II.
+
 | Página | O que faz |
 |---|---|
-| `/` | Apresentação, contagem regressiva e chamada da fase atual |
-| `/inscricao` | Formulário de inscrição com até 3 fotos (abre de 09/11 a 30/11) |
-| `/casas` | Galeria e mapa das casas aprovadas |
-| `/votar` | Votação, 1 voto por CPF, com mapa/roteiro das casas |
-| `/resultado` | Classificação preliminar (fase "Classificação preliminar") e casa vencedora com a classificação definitiva (fase "Resultado definitivo") |
-| `/contestacao` | Canal oficial de contestação da classificação preliminar (só na fase preliminar, até 16/12 às 18h) |
+| `/` | Página de entrada: prêmio, botão "Inscreva minha casa" / "Votar" e escolha do bairro |
+| `/<regiao>` | Início do bairro: contagem regressiva, "Minha casa pode participar?", prêmio |
+| `/<regiao>/inscricao` | Inscrição com até 3 fotos e marcação no mapa |
+| `/<regiao>/casas` | Galeria e mapa das casas aprovadas |
+| `/<regiao>/votar` | Votação, 1 voto por CPF no bairro |
+| `/<regiao>/resultado` | Classificação preliminar e resultado definitivo |
+| `/<regiao>/contestacao` | Contestação da classificação preliminar (até 16/12 às 18h) |
+| `/<regiao>/regulamento` | Resumo das regras, mapa e ruas, com link para o PDF |
+| `/<regiao>/regulamento/completo` | Regulamento completo (texto em `src/app/[regiao]/regulamento/texto.ts`) |
 | `/privacidade` | Política de privacidade (LGPD) |
-| `/regulamento` | Regulamento oficial (texto em `src/app/regulamento/texto.ts`) |
-| `/admin` | Painel da organização: aprovar inscrições, apuração ao vivo, contestações, exportar CSV, controle de fase |
+| `/admin` | Painel: fase (vale para os dois bairros), abas por bairro com inscrições, apuração, contestações e CSV |
 
-**Quem define a fase é a organização**, no painel `/admin`: Em breve → Inscrições → Votação → Votação encerrada → Classificação preliminar (15/12, abre contestações) → Resultado definitivo (18/12). O menu do site mostra só o que vale na fase atual (ex.: nas inscrições aparece só "Inscrever minha casa"). As datas em `src/lib/config.ts` servem apenas para os textos e a contagem regressiva.
+**Quem define a fase é a organização**, no painel `/admin`: Em breve → Inscrições → Votação → Votação encerrada → Classificação preliminar (15/12, abre contestações) → Resultado definitivo (18/12). O menu do site mostra só o que vale na fase atual. As datas em `src/lib/config.ts` servem apenas para os textos e a contagem regressiva.
+
+**PDF do regulamento**: fica em `public/regulamentos/`. Se mudar o texto, gere de novo com o site rodando:
+`node scripts/gerar-pdf-regulamento.cjs http://localhost:3000`
 
 ## Rodar no computador
 
@@ -49,11 +59,12 @@ O arquivo `vercel.json` agenda uma chamada diária a `/api/saude`, que consulta 
 
 - **Datas, nome e organizador**: `src/lib/config.ts`
 - **Fonte dos títulos (P22 Yule Heavy Snow)**: coloque o arquivo em `public/fonts/p22-yule-heavy-snow.woff2` (veja `public/fonts/LEIA-ME.txt`). Sem o arquivo, os títulos usam a Mountains of Christmas.
-- **Área do concurso (mapa da inscrição)**: contorno em `src/lib/area.ts`, reproduzido do desenho no Google Earth. Para deixar exato, exporte o desenho como KML e troque os pontos. A inscrição só é aceita com a casa marcada dentro da área (conferido também no servidor).
-- **Ruas participantes**: `src/lib/ruas.ts` (nome oficial e CEP dos Correios, traçado do OpenStreetMap; "inteira" ou "parcial"). Aparecem no regulamento, no "Minha casa pode participar?" da página inicial e no preenchimento do CEP da inscrição.
+- **Bairros**: `src/lib/regioes.ts` (nome, logo, contorno e ruas de cada bairro).
+- **Área do concurso (mapa da inscrição)**: contornos em `src/lib/dados/<regiao>-area.json` (Scaffid II: desenho no Google Earth; Marengo: limite do bairro no Google Maps). Para deixar exato, exporte o desenho como KML e troque os pontos. A inscrição só é aceita com a casa marcada dentro da área do bairro (conferido também no servidor).
+- **Ruas participantes**: `src/lib/dados/<regiao>-ruas.json` (nome oficial e CEPs dos Correios, traçado do OpenStreetMap recortado na área; "inteira" ou "parcial").
 - **Foto do Marcos**: salve em `public/marcos.jpg` (aparece na seção "Uma iniciativa de" da página inicial).
 - **Logo**: salve em `public/logo.png` e siga o comentário em `src/components/Logo.tsx`
-- **Prêmio do 1º lugar** (só o 1º é premiado): preencha `premio` em `src/lib/config.ts`. Aparece na página inicial, no item 10.3 do regulamento e no resultado.
+- **Prêmio do 1º lugar** (o mesmo nos dois bairros): `premio` e `fotoPremio` em `src/lib/config.ts`. A foto aparece sempre com o aviso "imagem meramente ilustrativa".
 - **Regulamento**: texto em `src/app/regulamento/texto.ts`
 - **Número da casa e ponto no mapa público**: só aparecem quando o responsável marca a autorização na inscrição (regulamento 11.4). O painel mostra quem não autorizou.
 

@@ -5,17 +5,20 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { enderecoPublico, nomeCasa, paraPublico } from "@/components/CartaoCasa";
 import { db, faseAtual } from "@/lib/db";
+import { regiaoOuNula } from "@/lib/regioes";
 
-async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+async function Detalhe({ params }: { params: Promise<{ id: string; regiao: string }> }) {
+  const { id, regiao: r } = await params;
+  const regiao = regiaoOuNula(r);
+  if (!regiao) notFound();
   const store = await db();
   const ins = /^[0-9a-f-]{36}$/i.test(id) ? await store.buscarInscricao(id) : null;
-  if (!ins || ins.status !== "aprovada") notFound();
+  if (!ins || ins.status !== "aprovada" || ins.regiao !== regiao.id) notFound();
   const casa = paraPublico(ins, (c) => store.urlFoto(c));
   const { fase } = await faseAtual();
   return (
     <div className="mx-auto max-w-4xl px-4 py-10">
-      <Link href="/casas" className="font-bold text-verde hover:underline">
+      <Link href={`/${regiao.id}/casas`} className="font-bold text-verde hover:underline">
         ← Todas as casas
       </Link>
       <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -29,7 +32,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
       </p>
       {casa.descricao && <p className="mt-4 text-lg">{casa.descricao}</p>}
       {fase === "votacao" && (
-        <Link href={`/votar?casa=${casa.id}`} className="btn btn-vermelho mt-6">
+        <Link href={`/${regiao.id}/votar?casa=${casa.id}`} className="btn btn-vermelho mt-6">
           <Vote size={18} aria-hidden /> Votar nesta casa
         </Link>
       )}
@@ -42,7 +45,7 @@ async function Detalhe({ params }: { params: Promise<{ id: string }> }) {
   );
 }
 
-export default function PaginaCasa({ params }: PageProps<"/casas/[id]">) {
+export default function PaginaCasa({ params }: PageProps<"/[regiao]/casas/[id]">) {
   return (
     <Suspense fallback={<p className="py-20 text-center text-tinta-suave">Carregando…</p>}>
       <Detalhe params={params} />

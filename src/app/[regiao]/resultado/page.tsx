@@ -10,10 +10,12 @@ import { DATAS, EVENTO, formatarData, formatarDataHora } from "@/lib/config";
 import { faseAtual } from "@/lib/db";
 import { contestacaoAberta } from "@/lib/phase";
 import { ranking } from "@/lib/ranking";
+import type { Regiao } from "@/lib/regioes";
+import { regiaoDaRota } from "@/lib/rota";
 
 export const metadata: Metadata = { title: "Resultado" };
 
-async function Conteudo() {
+async function Conteudo({ regiao }: { regiao: Regiao }) {
   const { fase } = await faseAtual();
   if (fase !== "resultado" && fase !== "preliminar") {
     return (
@@ -24,7 +26,7 @@ async function Conteudo() {
     );
   }
   const preliminar = fase === "preliminar";
-  const { lista, total } = await ranking();
+  const { lista, total } = await ranking(regiao.id);
   if (lista.length === 0) return <Aviso icone={TreePine} titulo="Nenhuma casa participou" />;
   const primeiros = lista.filter((c) => c.posicao === 1);
   const demais = lista.filter((c) => c.posicao > 1);
@@ -44,7 +46,7 @@ async function Conteudo() {
             </p>
           </div>
           {contestacaoAberta(fase) && (
-            <Link href="/contestacao" className="btn btn-verde shrink-0">
+            <Link href={`/${regiao.id}/contestacao`} className="btn btn-verde shrink-0">
               Contestar <ArrowRight size={18} aria-hidden />
             </Link>
           )}
@@ -104,19 +106,20 @@ async function Conteudo() {
         </>
       )}
       <p className="mt-8 text-center text-tinta-suave">
-        Total de {total} votos válidos. Obrigado a todas as famílias que iluminaram o Scaffid II!
+        Total de {total} votos válidos. Obrigado a todas as famílias que iluminaram o {regiao.nome}!
       </p>
     </>
   );
 }
 
-export default function PaginaResultado() {
+export default async function PaginaResultado({ params }: PageProps<"/[regiao]/resultado">) {
+  const regiao = await regiaoDaRota(params);
   return (
     <>
-      <Titulo titulo="Resultado" subtitulo="A casa mais iluminada do Scaffid II" />
+      <Titulo titulo="Resultado" subtitulo={`A casa mais iluminada do ${regiao.nome}`} />
       <div className="mx-auto max-w-6xl px-4 py-12">
         <Suspense fallback={<p className="text-center text-tinta-suave">Carregando…</p>}>
-          <Conteudo />
+          <Conteudo regiao={regiao} />
         </Suspense>
       </div>
     </>

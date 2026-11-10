@@ -4,18 +4,29 @@ import type { Map as MapaLeaflet, Polyline } from "leaflet";
 import { useEffect, useRef, useState } from "react";
 import { desenharRuas, destacarRua, useMapa, type L as Leaflet } from "@/lib/mapaBase";
 import { AvisoMapa } from "./AvisoMapa";
+import type { RegiaoId } from "@/lib/regioes";
 import type { Rua } from "@/lib/ruas";
 
 /** Mapa só para consulta: a área do concurso, as ruas participantes e (opcional) uma rua em destaque. */
-export function MapaArea({ destaque, mostrarRuas = true, altura = "h-80 sm:h-[28rem]" }: { destaque?: Rua | null; mostrarRuas?: boolean; altura?: string }) {
+export function MapaArea({
+  regiao,
+  destaque,
+  mostrarRuas = true,
+  altura = "h-80 sm:h-[28rem]",
+}: {
+  regiao: RegiaoId;
+  destaque?: Rua | null;
+  mostrarRuas?: boolean;
+  altura?: string;
+}) {
   const caixa = useRef<HTMLDivElement>(null);
   const mapa = useRef<MapaLeaflet | null>(null);
   const lib = useRef<Leaflet | null>(null);
   const linha = useRef<Polyline | null>(null);
   const [pronto, setPronto] = useState(false);
 
-  const aviso = useMapa(caixa, ({ L, mapa: m }) => {
-    if (mostrarRuas) desenharRuas(L, m);
+  const aviso = useMapa(caixa, regiao, ({ L, mapa: m }) => {
+    if (mostrarRuas) desenharRuas(L, m, regiao);
     mapa.current = m;
     lib.current = L;
     setPronto(true);
