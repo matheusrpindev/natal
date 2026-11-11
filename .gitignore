@@ -44,7 +44,9 @@ next-env.d.ts
 /.data
 
 # arquivos de fonte com licença comercial (não versionar)
+# A fonte dos títulos (p22-yule-heavy-snow.woff2) é publicada; outros formatos ficam de fora.
 /public/fonts/*.woff2
+!/public/fonts/p22-yule-heavy-snow.woff2
 /public/fonts/*.woff
 /public/fonts/*.otf
 /public/fonts/*.ttf
